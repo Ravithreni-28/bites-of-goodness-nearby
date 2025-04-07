@@ -1,0 +1,84 @@
+
+import { useState } from 'react';
+import { MapPin, Menu, Search, User, Plus, X } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+export const Navbar = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  return (
+    <nav className="sticky top-0 bg-white/95 backdrop-blur-sm border-b z-50 shadow-sm py-3">
+      <div className="container mx-auto px-4 flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex items-center">
+          <span className="text-2xl font-bold text-eco-green">
+            <span>Zero</span>
+            <span className="text-food-orange">Waste</span>
+            <span className="text-eco-green">Bites</span>
+          </span>
+        </div>
+        
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-8">
+          <div className="flex items-center text-muted-foreground hover:text-foreground transition-colors">
+            <MapPin className="h-4 w-4 mr-1" />
+            <span>Brooklyn, NY</span>
+          </div>
+          <Button variant="outline" className="flex items-center">
+            <Search className="h-4 w-4 mr-2" />
+            <span>Search</span>
+          </Button>
+          <Button variant="default" className="bg-eco-green hover:bg-eco-green-dark flex items-center">
+            <Plus className="h-4 w-4 mr-2" />
+            <span>Share Food</span>
+          </Button>
+          <Button variant="ghost" className="flex items-center">
+            <User className="h-5 w-5" />
+          </Button>
+        </div>
+        
+        {/* Mobile menu button */}
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" className="md:hidden" size="icon">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[280px] sm:w-[350px]">
+            <div className="py-6 space-y-6">
+              <div className="px-2">
+                <h2 className="text-xl font-bold mb-2">
+                  <span className="text-eco-green">Zero</span>
+                  <span className="text-food-orange">Waste</span>
+                  <span className="text-eco-green">Bites</span>
+                </h2>
+              </div>
+              <div className="space-y-3 px-2">
+                <div className="flex items-center py-2 hover:bg-muted rounded-md px-2">
+                  <MapPin className="h-5 w-5 mr-3" />
+                  <span>Change Location</span>
+                </div>
+                <div className="flex items-center py-2 hover:bg-muted rounded-md px-2">
+                  <Search className="h-5 w-5 mr-3" />
+                  <span>Search Food</span>
+                </div>
+                <div className="flex items-center py-2 hover:bg-muted rounded-md px-2">
+                  <Plus className="h-5 w-5 mr-3" />
+                  <span>Share Food</span>
+                </div>
+                <div className="flex items-center py-2 hover:bg-muted rounded-md px-2">
+                  <User className="h-5 w-5 mr-3" />
+                  <span>Profile</span>
+                </div>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;

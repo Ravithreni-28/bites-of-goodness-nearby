@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Zero Waste Bites custom colors
+				'eco-green': {
+					light: '#8BC34A',
+					DEFAULT: '#4CAF50',
+					dark: '#388E3C'
+				},
+				'food-orange': {
+					light: '#FFB74D',
+					DEFAULT: '#FF9800',
+					dark: '#F57C00'
 				}
 			},
 			borderRadius: {
@@ -84,11 +96,22 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.4s ease-out'
 			}
 		}
 	},
