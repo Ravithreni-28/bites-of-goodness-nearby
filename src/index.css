@@ -14,16 +14,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 122 39% 49%;
+    --primary: 24 98% 56%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 36 100% 50%;
+    --secondary: 199 89% 48%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 36 100% 50%;
+    --accent: 352 70% 50%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -31,7 +31,7 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 122 39% 49%;
+    --ring: 24 98% 56%;
 
     --radius: 0.8rem;
   }
@@ -71,5 +71,9 @@
 @layer utilities {
   .hover-scale {
     @apply transition-transform duration-200 hover:scale-[1.02];
+  }
+  
+  .indian-gradient {
+    @apply bg-gradient-to-r from-[#FF9933] via-white to-[#138808];
   }
 }

@@ -29,65 +29,65 @@ export interface FoodListing {
 export const mockFoodListings: FoodListing[] = [
   {
     id: "1",
-    title: "Homemade Vegetable Lasagna",
-    description: "Freshly made vegetable lasagna. Made too much for my family dinner. Enough for 2-3 people. Pick up only.",
-    price: 5.99,
+    title: "Homemade Hyderabadi Biryani",
+    description: "Authentic Hyderabadi dum biryani made with basmati rice and tender chicken. Made too much for family dinner. Enough for 3-4 people.",
+    price: 250,
     quantity: {
       amount: 1,
-      unit: "tray"
+      unit: "handi"
     },
-    imageUrl: "https://source.unsplash.com/R-zOqJpAQ3I",
+    imageUrl: "https://source.unsplash.com/W3SEyZODn8U",
     location: {
-      display: "Downtown",
-      distance: 0.8
+      display: "Banjara Hills",
+      distance: 1.2
     },
     postedAt: new Date(Date.now() - 3600000), // 1 hour ago
     seller: {
       id: "user1",
-      name: "Marie K.",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+      name: "Arjun R.",
+      avatar: "https://randomuser.me/api/portraits/men/44.jpg",
       rating: 4.8
     },
-    tags: ["homemade", "italian", "dinner"],
-    dietary: ["vegetarian"]
+    tags: ["homemade", "biryani", "dinner"],
+    dietary: ["non-vegetarian"]
   },
   {
     id: "2",
-    title: "Chocolate Chip Cookies",
-    description: "Baked too many cookies for a birthday party. Two dozen chocolate chip cookies available.",
-    price: 3.50,
+    title: "Osmania Biscuits",
+    description: "Freshly baked Osmania biscuits. Perfect with Irani chai. Giving away extra from my bakery.",
+    price: null, // Free
     quantity: {
       amount: 24,
       unit: "pieces"
     },
-    imageUrl: "https://source.unsplash.com/O5EMzfdxedg",
+    imageUrl: "https://source.unsplash.com/nP11TkjxJ7s",
     location: {
-      display: "Rose Hill",
-      distance: 1.2
+      display: "Charminar",
+      distance: 2.5
     },
     postedAt: new Date(Date.now() - 7200000), // 2 hours ago
     seller: {
       id: "user2",
-      name: "James L.",
+      name: "Mohammed F.",
       avatar: "https://randomuser.me/api/portraits/men/32.jpg",
       rating: 4.6
     },
-    tags: ["dessert", "baked", "sweet"],
-    dietary: []
+    tags: ["baked", "sweet", "snack"],
+    dietary: ["vegetarian"]
   },
   {
     id: "3",
-    title: "Chicken Curry with Rice",
-    description: "Made extra chicken curry with basmati rice. Spicy and delicious! Enough for 2 people.",
-    price: 7.99,
+    title: "Homemade Mirchi ka Salan",
+    description: "Authentic spicy mirchi ka salan. Perfect side dish for biryani. Made extra for a family gathering.",
+    price: 180,
     quantity: {
-      amount: 2,
-      unit: "servings"
+      amount: 500,
+      unit: "grams"
     },
-    imageUrl: "https://source.unsplash.com/XaDsH-O2QXs",
+    imageUrl: "https://source.unsplash.com/6hnDJG4dO5o",
     location: {
-      display: "Westside",
-      distance: 1.5
+      display: "Gachibowli",
+      distance: 3.2
     },
     postedAt: new Date(Date.now() - 5400000), // 1.5 hours ago
     seller: {
@@ -96,91 +96,95 @@ export const mockFoodListings: FoodListing[] = [
       avatar: "https://randomuser.me/api/portraits/women/67.jpg",
       rating: 4.9
     },
-    tags: ["indian", "spicy", "dinner"],
-    dietary: ["gluten-free"]
+    tags: ["hyderabadi", "spicy", "curry"],
+    dietary: ["vegetarian"]
   },
   {
     id: "4",
-    title: "Garden Fresh Salad",
-    description: "Fresh garden salad with homegrown vegetables. Giving away as I'm going out of town tomorrow.",
+    title: "Irani Chai and Samosa",
+    description: "Fresh samosas with Irani chai. Have extra from my cafe that would go to waste. Come pick up quickly!",
     price: null, // Free
     quantity: {
-      amount: 1,
-      unit: "large bowl"
+      amount: 6,
+      unit: "servings"
     },
-    imageUrl: "https://source.unsplash.com/IGfIGP5ONV0",
+    imageUrl: "https://source.unsplash.com/y8OPPvo_7Hk",
     location: {
-      display: "Greenview",
-      distance: 0.6
+      display: "Himayat Nagar",
+      distance: 0.8
     },
     postedAt: new Date(Date.now() - 1800000), // 30 mins ago
     seller: {
       id: "user4",
-      name: "Thomas H.",
+      name: "Rajesh K.",
       avatar: "https://randomuser.me/api/portraits/men/55.jpg",
       rating: 4.7
     },
-    tags: ["fresh", "healthy", "salad"],
-    dietary: ["vegan", "organic"]
+    tags: ["snack", "tea", "evening"],
+    dietary: ["vegetarian"]
   },
   {
     id: "5",
-    title: "Homemade Apple Pie",
-    description: "Freshly baked apple pie. Made an extra one and it's still warm!",
-    price: 8.50,
+    title: "Double Ka Meetha",
+    description: "Traditional Hyderabadi dessert. Made too much for a family function. Sweet and delicious!",
+    price: 200,
     quantity: {
-      amount: 1,
-      unit: "pie (8 slices)"
+      amount: 500,
+      unit: "grams"
     },
-    imageUrl: "https://source.unsplash.com/uQs1802D0CQ",
+    imageUrl: "https://source.unsplash.com/c3LZ-FpF8RY",
     location: {
-      display: "North End",
-      distance: 2.1
+      display: "Mehdipatnam",
+      distance: 2.8
     },
     postedAt: new Date(Date.now() - 9000000), // 2.5 hours ago
     seller: {
       id: "user5",
-      name: "Emma W.",
+      name: "Lakshmi P.",
       avatar: "https://randomuser.me/api/portraits/women/22.jpg",
       rating: 4.9
     },
-    tags: ["dessert", "baked", "sweet"],
-    dietary: ["contains nuts"]
+    tags: ["dessert", "sweet", "hyderabadi"],
+    dietary: ["vegetarian", "contains dairy"]
   },
   {
     id: "6",
-    title: "Pasta Primavera",
-    description: "Extra pasta with spring vegetables in a light cream sauce. Restaurant quality from a home chef!",
-    price: 6.75,
+    title: "Homemade Haleem",
+    description: "Authentic Hyderabadi haleem made with wheat, lentils and meat. Slow-cooked for hours. Special Ramzan recipe.",
+    price: 300,
     quantity: {
-      amount: 3,
-      unit: "servings"
+      amount: 750,
+      unit: "grams"
     },
-    imageUrl: "https://source.unsplash.com/oBbTc1VoT-0",
+    imageUrl: "https://source.unsplash.com/aX_ljOOyWJY",
     location: {
-      display: "Midtown",
-      distance: 1.8
+      display: "Tolichowki",
+      distance: 1.5
     },
     postedAt: new Date(Date.now() - 10800000), // 3 hours ago
     seller: {
       id: "user6",
-      name: "Carlos M.",
+      name: "Imran S.",
       avatar: "https://randomuser.me/api/portraits/men/26.jpg",
       rating: 4.7
     },
-    tags: ["italian", "dinner", "pasta"],
-    dietary: ["vegetarian"]
+    tags: ["haleem", "dinner", "ramzan"],
+    dietary: ["non-vegetarian", "contains wheat"]
   }
 ];
 
 export const dietaryTags = [
   "vegetarian", 
   "vegan", 
+  "non-vegetarian",
   "gluten-free", 
   "dairy-free", 
   "nut-free", 
   "organic", 
-  "contains nuts"
+  "contains nuts",
+  "contains dairy",
+  "contains wheat",
+  "jain"
 ];
 
 export const foodTags = [
@@ -194,8 +198,14 @@ export const foodTags = [
   "baked", 
   "sweet", 
   "spicy", 
-  "italian", 
-  "indian", 
-  "asian", 
-  "mexican"
+  "biryani",
+  "curry",
+  "snack", 
+  "hyderabadi",
+  "south indian",
+  "north indian",
+  "street food",
+  "haleem",
+  "ramzan",
+  "festive"
 ];

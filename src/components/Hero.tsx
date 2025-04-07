@@ -5,17 +5,17 @@ import { Input } from "@/components/ui/input";
 
 const Hero = () => {
   return (
-    <div className="relative bg-gradient-to-r from-eco-green/10 to-food-orange/10 py-10 px-4 md:py-20">
+    <div className="relative bg-gradient-to-r from-[#FF9933]/10 to-[#138808]/10 py-10 px-4 md:py-20">
       <div className="container mx-auto text-center">
         <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-          <span className="text-eco-green">Rescue</span> food, 
-          <span className="text-food-orange"> Save</span> money, 
-          <span className="text-eco-green"> Build</span> community
+          <span className="text-[#FF9933]">Share</span> Food, 
+          <span className="text-[#138808]"> Save</span> Money, 
+          <span className="text-[#138808]"> Connect</span> Hyderabad
         </h1>
         
         <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-600">
-          Connect with your neighbors to buy, sell, or donate excess food. 
-          Reduce waste, save money, and build a more sustainable community.
+          Join the community of Hyderabadis sharing homemade biryani, curries, and more. 
+          Reduce food waste, save money, and build a more sustainable Hyderabad.
         </p>
         
         <div className="max-w-2xl mx-auto">
@@ -26,9 +26,9 @@ const Hero = () => {
               </div>
               <Input 
                 type="text" 
-                placeholder="Your location" 
+                placeholder="Your location in Hyderabad" 
                 className="pl-10 py-6 border-gray-300 rounded-lg shadow-sm" 
-                defaultValue="Brooklyn, NY"
+                defaultValue="Banjara Hills, Hyderabad"
               />
             </div>
             <div className="relative flex-grow">
@@ -41,17 +41,17 @@ const Hero = () => {
                 className="pl-10 py-6 border-gray-300 rounded-lg shadow-sm" 
               />
             </div>
-            <Button className="bg-eco-green hover:bg-eco-green-dark py-6 px-8">
+            <Button className="bg-[#FF9933] hover:bg-[#FF8800] py-6 px-8 text-white">
               Find Food
             </Button>
           </div>
         </div>
         
         <div className="flex flex-wrap justify-center gap-3 mt-6">
-          <span className="text-sm px-4 py-2 bg-eco-green/10 text-eco-green-dark rounded-full">Homemade meals</span>
-          <span className="text-sm px-4 py-2 bg-eco-green/10 text-eco-green-dark rounded-full">Bakery extras</span>
-          <span className="text-sm px-4 py-2 bg-eco-green/10 text-eco-green-dark rounded-full">Garden produce</span>
-          <span className="text-sm px-4 py-2 bg-eco-green/10 text-eco-green-dark rounded-full">Restaurant surplus</span>
+          <span className="text-sm px-4 py-2 bg-[#FF9933]/10 text-[#FF9933] rounded-full">Biryani</span>
+          <span className="text-sm px-4 py-2 bg-[#138808]/10 text-[#138808] rounded-full">Hyderabadi Curries</span>
+          <span className="text-sm px-4 py-2 bg-[#FF9933]/10 text-[#FF9933] rounded-full">Homemade Sweets</span>
+          <span className="text-sm px-4 py-2 bg-[#138808]/10 text-[#138808] rounded-full">Restaurant Surplus</span>
         </div>
       </div>
     </div>
