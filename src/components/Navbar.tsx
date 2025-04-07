@@ -4,7 +4,6 @@ import { MapPin, Menu, Search, User, Plus, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import ProfileBadge from './ProfileBadge';
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -14,10 +13,10 @@ export const Navbar = () => {
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <span className="text-2xl font-bold">
-            <span className="text-[#FF9933]">Apna</span>
-            <span className="text-[#138808]">Khana</span>
-            <span className="text-[#000080]">Share</span>
+          <span className="text-2xl font-bold text-eco-green">
+            <span>Zero</span>
+            <span className="text-food-orange">Waste</span>
+            <span className="text-eco-green">Bites</span>
           </span>
         </div>
         
@@ -25,17 +24,19 @@ export const Navbar = () => {
         <div className="hidden md:flex items-center space-x-8">
           <div className="flex items-center text-muted-foreground hover:text-foreground transition-colors">
             <MapPin className="h-4 w-4 mr-1" />
-            <span>Hyderabad, Telangana</span>
+            <span>Brooklyn, NY</span>
           </div>
           <Button variant="outline" className="flex items-center">
             <Search className="h-4 w-4 mr-2" />
             <span>Search</span>
           </Button>
-          <Button variant="default" className="bg-[#FF9933] hover:bg-[#FF8800] flex items-center">
+          <Button variant="default" className="bg-eco-green hover:bg-eco-green-dark flex items-center">
             <Plus className="h-4 w-4 mr-2" />
             <span>Share Food</span>
           </Button>
-          <ProfileBadge />
+          <Button variant="ghost" className="flex items-center">
+            <User className="h-5 w-5" />
+          </Button>
         </div>
         
         {/* Mobile menu button */}
@@ -49,9 +50,9 @@ export const Navbar = () => {
             <div className="py-6 space-y-6">
               <div className="px-2">
                 <h2 className="text-xl font-bold mb-2">
-                  <span className="text-[#FF9933]">Apna</span>
-                  <span className="text-[#138808]">Khana</span>
-                  <span className="text-[#000080]">Share</span>
+                  <span className="text-eco-green">Zero</span>
+                  <span className="text-food-orange">Waste</span>
+                  <span className="text-eco-green">Bites</span>
                 </h2>
               </div>
               <div className="space-y-3 px-2">
