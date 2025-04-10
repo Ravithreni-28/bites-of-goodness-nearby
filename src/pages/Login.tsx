@@ -29,7 +29,7 @@ const Login = () => {
     // This would be replaced with actual authentication logic
     toast({
       title: "Login Successful",
-      description: "Welcome back to ApnaKhanaShare!"
+      description: "Welcome back to ZeroWasteBites!"
     });
     
     navigate('/');
@@ -44,7 +44,7 @@ const Login = () => {
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-2xl">Welcome Back</CardTitle>
             <CardDescription>
-              Sign in to your ApnaKhanaShare account
+              Sign in to your ZeroWasteBites account
             </CardDescription>
           </CardHeader>
           

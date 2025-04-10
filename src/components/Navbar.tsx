@@ -20,9 +20,9 @@ export const Navbar = () => {
         <div className="flex items-center">
           <Link to="/">
             <span className="text-2xl font-bold">
-              <span className="text-[#FF9933]">Apna</span>
-              <span className="text-[#138808]">Khana</span>
-              <span className="text-[#000080]">Share</span>
+              <span className="text-[#FF9933]">Zero</span>
+              <span className="text-[#138808]">Waste</span>
+              <span className="text-[#000080]">Bites</span>
             </span>
           </Link>
         </div>
@@ -58,9 +58,9 @@ export const Navbar = () => {
               <div className="px-2">
                 <Link to="/">
                   <h2 className="text-xl font-bold mb-2">
-                    <span className="text-[#FF9933]">Apna</span>
-                    <span className="text-[#138808]">Khana</span>
-                    <span className="text-[#000080]">Share</span>
+                    <span className="text-[#FF9933]">Zero</span>
+                    <span className="text-[#138808]">Waste</span>
+                    <span className="text-[#000080]">Bites</span>
                   </h2>
                 </Link>
               </div>

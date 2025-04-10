@@ -130,9 +130,9 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-xl font-bold mb-4">
-                <span className="text-[#FF9933]">Apna</span>
-                <span className="text-white">Khana</span>
-                <span className="text-[#138808]">Share</span>
+                <span className="text-[#FF9933]">Zero</span>
+                <span className="text-white">Waste</span>
+                <span className="text-[#138808]">Bites</span>
               </h3>
               <p className="text-gray-300">
                 Connecting Hyderabadis through food sharing, reducing waste one meal at a time.
@@ -163,7 +163,7 @@ const Index = () => {
           <Separator className="my-8 bg-gray-700" />
           
           <div className="text-center text-gray-400 text-sm">
-            &copy; {new Date().getFullYear()} ApnaKhanaShare. All rights reserved.
+            &copy; {new Date().getFullYear()} ZeroWasteBites. All rights reserved.
           </div>
         </div>
       </footer>
