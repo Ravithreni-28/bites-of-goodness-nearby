@@ -63,16 +63,19 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Zero Waste Bites custom colors
+				// Indian-themed colors
 				'eco-green': {
-					light: '#8BC34A',
-					DEFAULT: '#4CAF50',
-					dark: '#388E3C'
+					light: '#6BCB77',
+					DEFAULT: '#138808', // Indian flag green
+					dark: '#0A6A3B'
 				},
 				'food-orange': {
-					light: '#FFB74D',
-					DEFAULT: '#FF9800',
+					light: '#FFB17A',
+					DEFAULT: '#FF9933', // Indian flag saffron
 					dark: '#F57C00'
+				},
+				'india-blue': {
+					DEFAULT: '#000080', // India navy blue
 				}
 			},
 			borderRadius: {

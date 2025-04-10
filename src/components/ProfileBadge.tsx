@@ -1,4 +1,5 @@
 
+import { Link } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -25,12 +26,16 @@ export const ProfileBadge = ({
   if (!isLoggedIn) {
     return (
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm">
-          Log in
-        </Button>
-        <Button variant="default" size="sm" className="bg-[#FF9933] hover:bg-[#FF8800]">
-          Sign up
-        </Button>
+        <Link to="/login">
+          <Button variant="outline" size="sm">
+            Log in
+          </Button>
+        </Link>
+        <Link to="/register">
+          <Button variant="default" size="sm" className="bg-[#FF9933] hover:bg-[#FF8800]">
+            Sign up
+          </Button>
+        </Link>
       </div>
     );
   }
@@ -53,12 +58,22 @@ export const ProfileBadge = ({
           <p className="text-xs text-muted-foreground">example@email.com</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Profile</DropdownMenuItem>
-        <DropdownMenuItem>My Listings</DropdownMenuItem>
-        <DropdownMenuItem>Saved Items</DropdownMenuItem>
-        <DropdownMenuItem>Messages</DropdownMenuItem>
+        <Link to="/dashboard">
+          <DropdownMenuItem>Dashboard</DropdownMenuItem>
+        </Link>
+        <Link to="/dashboard?tab=myListings">
+          <DropdownMenuItem>My Listings</DropdownMenuItem>
+        </Link>
+        <Link to="/dashboard?tab=saved">
+          <DropdownMenuItem>Saved Items</DropdownMenuItem>
+        </Link>
+        <Link to="/dashboard?tab=messages">
+          <DropdownMenuItem>Messages</DropdownMenuItem>
+        </Link>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <Link to="/settings">
+          <DropdownMenuItem>Settings</DropdownMenuItem>
+        </Link>
         <DropdownMenuItem>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

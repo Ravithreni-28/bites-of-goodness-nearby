@@ -2,6 +2,7 @@
 import { Search, MapPin } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from 'react-router-dom';
 
 const Hero = () => {
   return (
@@ -52,6 +53,21 @@ const Hero = () => {
           <span className="text-sm px-4 py-2 bg-[#138808]/10 text-[#138808] rounded-full">Hyderabadi Curries</span>
           <span className="text-sm px-4 py-2 bg-[#FF9933]/10 text-[#FF9933] rounded-full">Homemade Sweets</span>
           <span className="text-sm px-4 py-2 bg-[#138808]/10 text-[#138808] rounded-full">Restaurant Surplus</span>
+          <span className="text-sm px-4 py-2 bg-[#FF9933]/10 text-[#FF9933] rounded-full">Haleem</span>
+          <span className="text-sm px-4 py-2 bg-[#138808]/10 text-[#138808] rounded-full">Irani Chai</span>
+        </div>
+        
+        <div className="mt-10">
+          <Link to="/register">
+            <Button className="bg-[#138808] hover:bg-[#0A6A3B] text-white px-8 py-3 text-lg rounded-lg shadow-md mr-4">
+              Join Our Community
+            </Button>
+          </Link>
+          <Link to="/login">
+            <Button variant="outline" className="border-[#FF9933] text-[#FF9933] hover:bg-[#FF9933]/10 px-8 py-3 text-lg rounded-lg">
+              Log In
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
