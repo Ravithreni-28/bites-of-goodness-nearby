@@ -10,7 +10,7 @@ import SearchBar from '@/components/SearchBar';
 import FoodListingForm from '@/components/FoodListingForm';
 import { mockFoodListings } from '@/utils/mockData';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin, Timer, Info } from 'lucide-react';
+import { MapPin, Timer, Info, IndianRupee } from 'lucide-react';
 
 const Index = () => {
   const { toast } = useToast();
@@ -39,7 +39,7 @@ const Index = () => {
         
         <section className="container mx-auto py-10 px-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <h2 className="text-2xl font-bold">Available Food Near You</h2>
+            <h2 className="text-2xl font-bold">Available Food In Hyderabad</h2>
             <div className="flex items-center gap-2">
               <SearchBar onSearch={handleSearch} />
             </div>
@@ -98,27 +98,27 @@ const Index = () => {
             <h2 className="text-3xl font-bold mb-8">How It Works</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center animate-fade-in">
-                <div className="w-16 h-16 bg-eco-green/10 rounded-full flex items-center justify-center mb-4">
-                  <Timer className="h-8 w-8 text-eco-green" />
+                <div className="w-16 h-16 bg-[#FF9933]/10 rounded-full flex items-center justify-center mb-4">
+                  <Timer className="h-8 w-8 text-[#FF9933]" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">List Your Food</h3>
-                <p className="text-gray-600">Take a photo and add details about your excess food. Set a price or offer it for free.</p>
+                <h3 className="text-xl font-semibold mb-2">Share Your Food</h3>
+                <p className="text-gray-600">Take a photo of your homemade biryani, curry, or any food. Set a price or offer it for free.</p>
               </div>
               
               <div className="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center animate-fade-in" style={{ animationDelay: '100ms' }}>
-                <div className="w-16 h-16 bg-food-orange/10 rounded-full flex items-center justify-center mb-4">
-                  <MapPin className="h-8 w-8 text-food-orange" />
+                <div className="w-16 h-16 bg-[#138808]/10 rounded-full flex items-center justify-center mb-4">
+                  <MapPin className="h-8 w-8 text-[#138808]" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Connect Locally</h3>
-                <p className="text-gray-600">Find or provide food in your neighborhood. Build community connections through food sharing.</p>
+                <h3 className="text-xl font-semibold mb-2">Connect In Hyderabad</h3>
+                <p className="text-gray-600">Find or provide food across Hyderabad neighborhoods. Build community connections through food sharing.</p>
               </div>
               
               <div className="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center animate-fade-in" style={{ animationDelay: '200ms' }}>
-                <div className="w-16 h-16 bg-eco-green/10 rounded-full flex items-center justify-center mb-4">
-                  <Info className="h-8 w-8 text-eco-green" />
+                <div className="w-16 h-16 bg-[#FF9933]/10 rounded-full flex items-center justify-center mb-4">
+                  <Info className="h-8 w-8 text-[#FF9933]" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Reduce Waste</h3>
-                <p className="text-gray-600">Help create a sustainable community by reducing food waste and carbon emissions.</p>
+                <p className="text-gray-600">Help create a sustainable Hyderabad by reducing food waste and sharing with those who can use it.</p>
               </div>
             </div>
           </div>
@@ -130,12 +130,12 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-xl font-bold mb-4">
-                <span className="text-eco-green-light">Zero</span>
-                <span className="text-food-orange-light">Waste</span>
-                <span className="text-eco-green-light">Bites</span>
+                <span className="text-[#FF9933]">Apna</span>
+                <span className="text-white">Khana</span>
+                <span className="text-[#138808]">Share</span>
               </h3>
               <p className="text-gray-300">
-                Connecting communities through food sharing, reducing waste one meal at a time.
+                Connecting Hyderabadis through food sharing, reducing waste one meal at a time.
               </p>
             </div>
             
@@ -163,7 +163,7 @@ const Index = () => {
           <Separator className="my-8 bg-gray-700" />
           
           <div className="text-center text-gray-400 text-sm">
-            &copy; {new Date().getFullYear()} Zero Waste Bites. All rights reserved.
+            &copy; {new Date().getFullYear()} ApnaKhanaShare. All rights reserved.
           </div>
         </div>
       </footer>

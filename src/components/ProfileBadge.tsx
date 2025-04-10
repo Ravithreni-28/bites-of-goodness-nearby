@@ -28,7 +28,7 @@ export const ProfileBadge = ({
         <Button variant="outline" size="sm">
           Log in
         </Button>
-        <Button variant="default" size="sm" className="bg-eco-green hover:bg-eco-green-dark">
+        <Button variant="default" size="sm" className="bg-[#FF9933] hover:bg-[#FF8800]">
           Sign up
         </Button>
       </div>
