@@ -115,10 +115,10 @@ const Index = () => {
               
               <div className="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center animate-fade-in" style={{ animationDelay: '200ms' }}>
                 <div className="w-16 h-16 bg-[#FF9933]/10 rounded-full flex items-center justify-center mb-4">
-                  <Info className="h-8 w-8 text-[#FF9933]" />
+                  <IndianRupee className="h-8 w-8 text-[#FF9933]" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Reduce Waste</h3>
-                <p className="text-gray-600">Help create a sustainable Hyderabad by reducing food waste and sharing with those who can use it.</p>
+                <h3 className="text-xl font-semibold mb-2">Save Money</h3>
+                <p className="text-gray-600">Get affordable homemade food and help others earn from their surplus cooking. Everyone wins!</p>
               </div>
             </div>
           </div>

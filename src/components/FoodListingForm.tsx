@@ -23,17 +23,18 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Plus, X } from 'lucide-react';
+import { Camera, Plus, X, IndianRupee } from 'lucide-react';
 import { dietaryTags, foodTags } from '@/utils/mockData';
 
 interface FoodListingFormProps {
   onSubmit?: (data: any) => void;
+  children?: React.ReactNode;
 }
 
-export const FoodListingForm = ({ onSubmit }: FoodListingFormProps) => {
+export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) => {
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [price, setPrice] = useState<number>(5);
+  const [price, setPrice] = useState<number>(200);
   const [isFree, setIsFree] = useState(false);
   
   const handleDietaryTagToggle = (tag: string) => {
@@ -69,10 +70,12 @@ export const FoodListingForm = ({ onSubmit }: FoodListingFormProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="bg-eco-green hover:bg-eco-green-dark">
-          <Plus className="h-4 w-4 mr-2" />
-          Share Food
-        </Button>
+        {children || (
+          <Button className="bg-eco-green hover:bg-eco-green-dark">
+            <Plus className="h-4 w-4 mr-2" />
+            Share Food
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -95,7 +98,7 @@ export const FoodListingForm = ({ onSubmit }: FoodListingFormProps) => {
           
           <div className="space-y-2">
             <Label htmlFor="title">Food Title</Label>
-            <Input id="title" placeholder="e.g., Homemade Vegetable Lasagna" />
+            <Input id="title" placeholder="e.g., Homemade Chicken Biryani" />
           </div>
           
           <div className="space-y-2">
@@ -121,9 +124,10 @@ export const FoodListingForm = ({ onSubmit }: FoodListingFormProps) => {
                 <SelectContent>
                   <SelectItem value="servings">Servings</SelectItem>
                   <SelectItem value="pieces">Pieces</SelectItem>
-                  <SelectItem value="lbs">Pounds</SelectItem>
+                  <SelectItem value="grams">Grams</SelectItem>
                   <SelectItem value="kg">Kilograms</SelectItem>
                   <SelectItem value="container">Container</SelectItem>
+                  <SelectItem value="handi">Handi</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -142,13 +146,17 @@ export const FoodListingForm = ({ onSubmit }: FoodListingFormProps) => {
             {!isFree && (
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <Label htmlFor="price">Price: ${price.toFixed(2)}</Label>
+                  <Label htmlFor="price" className="flex items-center">
+                    <span>Price: </span>
+                    <IndianRupee className="h-3.5 w-3.5 mx-1" />
+                    <span>{price.toFixed(0)}</span>
+                  </Label>
                 </div>
                 <Slider
                   id="price"
-                  min={0.5}
-                  max={20}
-                  step={0.5}
+                  min={20}
+                  max={1000}
+                  step={10}
                   value={[price]}
                   onValueChange={(value) => setPrice(value[0])}
                 />
@@ -198,7 +206,7 @@ export const FoodListingForm = ({ onSubmit }: FoodListingFormProps) => {
           
           <div className="space-y-2">
             <Label>Pickup Address</Label>
-            <Input placeholder="Your address" />
+            <Input placeholder="Your address in Hyderabad" />
             <p className="text-xs text-muted-foreground">
               Only your neighborhood will be shown publicly. Exact address will be shared only with accepted buyers.
             </p>

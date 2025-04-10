@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { MapPin, Clock, Star } from 'lucide-react';
+import { MapPin, Clock, Star, IndianRupee } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { 
   Card, 
@@ -53,7 +53,12 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
           <Badge 
             className={price === null ? "bg-food-orange/90 text-white" : "bg-white/90 text-gray-700"}
           >
-            {price === null ? 'Free' : `$${price.toFixed(2)}`}
+            {price === null ? 'Free' : (
+              <span className="flex items-center">
+                <IndianRupee className="h-3 w-3 mr-0.5" />
+                {price.toFixed(0)}
+              </span>
+            )}
           </Badge>
         </div>
       </div>
