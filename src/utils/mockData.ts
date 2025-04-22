@@ -1,3 +1,4 @@
+
 import { addDays, subHours, subDays } from 'date-fns';
 
 export interface FoodListing {
@@ -66,7 +67,7 @@ export const mockFoodListings: FoodListing[] = [
     description: 'Delicious homemade chicken biryani, cooked today. Can serve 3-4 people. Fragrant basmati rice with tender chicken pieces.',
     price: 299,
     quantity: 4,
-    imageUrl: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8',
+    imageUrl: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0',
     location: {
       display: 'Himayatnagar, Hyderabad',
       distance: 2.3,
@@ -89,7 +90,7 @@ export const mockFoodListings: FoodListing[] = [
     description: 'Fresh homemade paneer butter masala with 6 rotis. Made with organic ingredients and pure ghee. No artificial flavors.',
     price: 180,
     quantity: 2,
-    imageUrl: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe',
+    imageUrl: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641',
     location: {
       display: 'Banjara Hills, Hyderabad',
       distance: 4.7,
@@ -112,7 +113,7 @@ export const mockFoodListings: FoodListing[] = [
     description: 'Fresh dal and rice from today\'s lunch. Still warm and very tasty. Free to anyone who can pick up in the next hour.',
     price: null,
     quantity: 1,
-    imageUrl: 'https://images.unsplash.com/photo-1517244683847-7456b63c5969',
+    imageUrl: 'https://images.unsplash.com/photo-1546833998-877b37c2e5c6',
     location: {
       display: 'Ameerpet, Hyderabad',
       distance: 1.2,
@@ -135,7 +136,7 @@ export const mockFoodListings: FoodListing[] = [
     description: 'Freshly made gulab jamun for dessert. Made with khoya and dipped in cardamom sugar syrup. Pack of 8 pieces.',
     price: 150,
     quantity: 8,
-    imageUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950',
+    imageUrl: 'https://images.unsplash.com/photo-1590591874743-e0ce15b14985',
     location: {
       display: 'Begumpet, Hyderabad',
       distance: 3.8,
@@ -158,7 +159,7 @@ export const mockFoodListings: FoodListing[] = [
     description: 'Complete vegetarian thali with dal, sabzi, rice, 4 rotis, pickle, and salad. Home-cooked with love and traditional spices.',
     price: 220,
     quantity: 2,
-    imageUrl: 'https://images.unsplash.com/photo-1546833998-877b37c2e5c6',
+    imageUrl: 'https://images.unsplash.com/photo-1626010647370-525c9c92820e',
     location: {
       display: 'Secunderabad, Hyderabad',
       distance: 5.9,
@@ -181,7 +182,7 @@ export const mockFoodListings: FoodListing[] = [
     description: 'Spicy Andhra-style chicken curry with tender pieces of chicken. Best enjoyed with rice or roti. Serves 3 people.',
     price: 280,
     quantity: 3,
-    imageUrl: 'https://images.unsplash.com/photo-1604335399105-a0c585fd81a1',
+    imageUrl: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398',
     location: {
       display: 'Kukatpally, Hyderabad',
       distance: 8.2,
@@ -204,7 +205,7 @@ export const mockFoodListings: FoodListing[] = [
     description: 'Crispy Mysore masala dosa with potato filling and spicy chutney spread inside. Comes with coconut chutney and sambar.',
     price: 120,
     quantity: 3,
-    imageUrl: 'https://images.unsplash.com/photo-1630383249896-448c19789d85',
+    imageUrl: 'https://images.unsplash.com/photo-1667030279959-e385cbc065cd',
     location: {
       display: 'Gachibowli, Hyderabad',
       distance: 9.5,
@@ -227,7 +228,7 @@ export const mockFoodListings: FoodListing[] = [
     description: 'Authentic Hyderabadi chicken haleem, perfect for Iftar or dinner. Rich, flavorful and filling. Made fresh today.',
     price: 320,
     quantity: 4,
-    imageUrl: 'https://images.unsplash.com/photo-1631515242808-543fa0114489',
+    imageUrl: 'https://images.unsplash.com/photo-1630949238920-63cdd9547c2d',
     location: {
       display: 'Charminar, Hyderabad',
       distance: 7.3,
@@ -273,7 +274,7 @@ export const mockFoodListings: FoodListing[] = [
     description: 'Various items from a wedding dinner including rice, curry, paneer dishes, and desserts. Free to those in need.',
     price: null,
     quantity: 10,
-    imageUrl: 'https://images.unsplash.com/photo-1611489142329-5f62cfa43e6e',
+    imageUrl: 'https://images.unsplash.com/photo-1610508500445-a4592435e27e',
     location: {
       display: 'Miyapur, Hyderabad',
       distance: 10.8,
