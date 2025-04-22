@@ -110,8 +110,8 @@ export const mockFoodListings: FoodListing[] = [
   {
     id: '3',
     title: 'Leftover Dal & Rice',
-    description: 'Fresh dal and rice from today\'s lunch. Still warm and very tasty. Free to anyone who can pick up in the next hour.',
-    price: null,
+    description: 'Fresh dal and rice from today\'s lunch. Still warm and very tasty.',
+    price: 40,
     quantity: 1,
     imageUrl: 'https://images.unsplash.com/photo-1546833998-877b37c2e5c6',
     location: {
@@ -271,8 +271,8 @@ export const mockFoodListings: FoodListing[] = [
   {
     id: '10',
     title: 'Extra Wedding Food',
-    description: 'Various items from a wedding dinner including rice, curry, paneer dishes, and desserts. Free to those in need.',
-    price: null,
+    description: 'Various items from a wedding dinner including rice, curry, paneer dishes, and desserts.',
+    price: 500,
     quantity: 10,
     imageUrl: 'https://images.unsplash.com/photo-1610508500445-a4592435e27e',
     location: {
@@ -288,9 +288,11 @@ export const mockFoodListings: FoodListing[] = [
       rating: 4.6,
       phone: '+91 0987654321'
     },
-    tags: ['wedding-food', 'variety', 'donation', 'free'],
+    tags: ['wedding-food', 'variety', 'sale'],
     dietary: ['Vegetarian', 'Non-vegetarian']
   }
 ];
 
 export default mockFoodListings;
+
+// Note: This file is getting quite long (297+ lines). You should consider refactoring it into smaller, focused files for better maintainability.

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +18,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  
+
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     toast({
@@ -27,7 +26,7 @@ const Index = () => {
       description: `Searching for: ${query || "all food"}`,
     });
   };
-  
+
   const handleListingSubmit = (data: any) => {
     toast({
       title: "Food listing created!",
@@ -36,7 +35,7 @@ const Index = () => {
   };
 
   const foodCategories = [
-    "All", "Breakfast", "Lunch", "Dinner", "Snacks", "Desserts", "Vegetarian", "Non-vegetarian", "Spicy", "Free"
+    "All", "Breakfast", "Lunch", "Dinner", "Snacks", "Desserts", "Vegetarian", "Non-vegetarian", "Spicy"
   ];
 
   const filteredListings = mockFoodListings
@@ -55,7 +54,6 @@ const Index = () => {
     })
     .filter(listing => {
       if (!selectedCategory || selectedCategory === "All") return true;
-      if (selectedCategory === "Free") return listing.price === null;
       if (selectedCategory === "Vegetarian") return listing.dietary.includes("Vegetarian");
       if (selectedCategory === "Non-vegetarian") return listing.dietary.includes("Non-vegetarian");
       if (selectedCategory === "Spicy") return listing.dietary.includes("Spicy");
@@ -64,13 +62,11 @@ const Index = () => {
         tag.toLowerCase().includes(selectedCategory.toLowerCase())
       );
     });
-  
+
   const getSortedListings = () => {
     switch (activeTab) {
       case "nearby":
         return [...filteredListings].sort((a, b) => a.location.distance - b.location.distance);
-      case "free":
-        return filteredListings.filter(listing => listing.price === null);
       case "recent":
         return [...filteredListings].sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());
       default:
@@ -79,7 +75,7 @@ const Index = () => {
   };
 
   const sortedListings = getSortedListings();
-  
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -116,7 +112,6 @@ const Index = () => {
                 <TabsList>
                   <TabsTrigger value="all">All Food</TabsTrigger>
                   <TabsTrigger value="nearby">Nearby</TabsTrigger>
-                  <TabsTrigger value="free">Free</TabsTrigger>
                   <TabsTrigger value="recent">Recent</TabsTrigger>
                 </TabsList>
                 <FoodListingForm onSubmit={handleListingSubmit} />
@@ -142,14 +137,6 @@ const Index = () => {
                       listing={listing} 
                       featured={index === 0}
                     />
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="free" className="pt-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {sortedListings.map((listing) => (
-                    <FoodCard key={listing.id} listing={listing} />
                   ))}
                 </div>
               </TabsContent>

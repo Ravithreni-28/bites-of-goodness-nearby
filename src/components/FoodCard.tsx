@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { MapPin, Clock, Star, IndianRupee, MoreHorizontal, Phone, Info } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
@@ -50,7 +49,7 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
 
   const [showDetails, setShowDetails] = useState(false);
   const formattedTime = formatDistance(postedAt, new Date(), { addSuffix: true });
-  
+
   return (
     <Card className={`overflow-hidden hover-scale ${featured ? 'border-eco-green border-2' : ''}`}>
       <div className="relative pb-[60%] overflow-hidden">
@@ -65,15 +64,11 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
           </div>
         )}
         <div className="absolute top-2 right-2 flex gap-2">
-          <Badge 
-            className={price === null ? "bg-food-orange/90 text-white" : "bg-white/90 text-gray-700"}
-          >
-            {price === null ? 'Free' : (
-              <span className="flex items-center">
-                <IndianRupee className="h-3 w-3 mr-0.5" />
-                {price.toFixed(0)}
-              </span>
-            )}
+          <Badge className="bg-white/90 text-gray-700">
+            <span className="flex items-center">
+              <IndianRupee className="h-3 w-3 mr-0.5" />
+              {price.toFixed(0)}
+            </span>
           </Badge>
           
           <Dialog>
@@ -89,7 +84,6 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
                   Posted {formattedTime}
                 </DialogDescription>
               </DialogHeader>
-              
               <div className="grid gap-4 py-4">
                 <div className="flex flex-col gap-2">
                   <img 
@@ -99,7 +93,6 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
                   />
                   <p className="text-sm text-gray-700">{description}</p>
                 </div>
-                
                 <div className="flex flex-wrap gap-1">
                   {dietary.map(item => (
                     <Badge key={item} variant="outline" className="text-xs bg-green-50">
@@ -107,7 +100,6 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
                     </Badge>
                   ))}
                 </div>
-
                 <div className="border-t pt-4">
                   <h4 className="font-medium mb-2 flex items-center">
                     <Info className="h-4 w-4 mr-2 text-muted-foreground" />
@@ -117,9 +109,7 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
                     <div>
                       <span className="text-muted-foreground">Price:</span> 
                       <span className="font-medium ml-1 flex items-center">
-                        {price === null ? 'Free' : (
-                          <><IndianRupee className="h-3 w-3 inline mr-0.5" />{price.toFixed(0)}</>
-                        )}
+                        <><IndianRupee className="h-3 w-3 inline mr-0.5" />{price.toFixed(0)}</>
                       </span>
                     </div>
                     <div>
@@ -132,7 +122,6 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
                     </div>
                   </div>
                 </div>
-
                 <div className="border-t pt-4">
                   <h4 className="font-medium mb-2 flex items-center">
                     <Avatar className="h-4 w-4 mr-2">
@@ -168,7 +157,6 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
                     </div>
                   </div>
                 </div>
-                
                 <div className="flex justify-end">
                   <Button>Contact Owner</Button>
                 </div>
@@ -177,7 +165,7 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
           </Dialog>
         </div>
       </div>
-      
+
       <CardHeader className="pt-4 pb-2">
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg">{title}</CardTitle>
@@ -187,10 +175,9 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
           <span>{location.display} • {location.distance} km</span>
         </div>
       </CardHeader>
-      
+
       <CardContent className="pb-3">
         <p className="text-sm text-gray-600 line-clamp-2">{description}</p>
-        
         <div className="flex flex-wrap gap-1 mt-3">
           {dietary.length > 0 && dietary.map(item => (
             <Badge key={item} variant="outline" className="text-xs bg-green-50">
@@ -199,7 +186,7 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
           ))}
         </div>
       </CardContent>
-      
+
       <CardFooter className="pt-0 flex items-center justify-between">
         <div className="flex items-center">
           <Avatar className="h-6 w-6 mr-2">

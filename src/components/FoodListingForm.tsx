@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,8 +34,7 @@ export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) =>
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [price, setPrice] = useState<number>(200);
-  const [isFree, setIsFree] = useState(false);
-  
+
   const handleDietaryTagToggle = (tag: string) => {
     if (selectedDietary.includes(tag)) {
       setSelectedDietary(selectedDietary.filter(t => t !== tag));
@@ -44,7 +42,7 @@ export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) =>
       setSelectedDietary([...selectedDietary, tag]);
     }
   };
-  
+
   const handleFoodTagToggle = (tag: string) => {
     if (selectedTags.includes(tag)) {
       setSelectedTags(selectedTags.filter(t => t !== tag));
@@ -52,21 +50,19 @@ export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) =>
       setSelectedTags([...selectedTags, tag]);
     }
   };
-  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Form submission logic would go here
     if (onSubmit) {
-      // Collect form data and pass it to onSubmit
       onSubmit({
         title: "Form submitted",
-        price: isFree ? null : price,
+        price,
         dietary: selectedDietary,
         tags: selectedTags
       });
     }
   };
-  
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -81,7 +77,7 @@ export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) =>
         <DialogHeader>
           <DialogTitle>Share Your Extra Food</DialogTitle>
           <DialogDescription>
-            List your excess food to sell or give away to others in your community.
+            List your excess food to sell to others in your community.
           </DialogDescription>
         </DialogHeader>
         
@@ -134,34 +130,21 @@ export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) =>
           </div>
           
           <div className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="is-free" 
-                checked={isFree} 
-                onCheckedChange={(checked) => setIsFree(checked === true)}
-              />
-              <Label htmlFor="is-free">Offer this food for free</Label>
+            <div className="flex justify-between">
+              <Label htmlFor="price" className="flex items-center">
+                <span>Price: </span>
+                <IndianRupee className="h-3.5 w-3.5 mx-1" />
+                <span>{price.toFixed(0)}</span>
+              </Label>
             </div>
-            
-            {!isFree && (
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label htmlFor="price" className="flex items-center">
-                    <span>Price: </span>
-                    <IndianRupee className="h-3.5 w-3.5 mx-1" />
-                    <span>{price.toFixed(0)}</span>
-                  </Label>
-                </div>
-                <Slider
-                  id="price"
-                  min={20}
-                  max={1000}
-                  step={10}
-                  value={[price]}
-                  onValueChange={(value) => setPrice(value[0])}
-                />
-              </div>
-            )}
+            <Slider
+              id="price"
+              min={20}
+              max={1000}
+              step={10}
+              value={[price]}
+              onValueChange={(value) => setPrice(value[0])}
+            />
           </div>
           
           <div className="space-y-2">
