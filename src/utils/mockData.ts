@@ -1,4 +1,3 @@
-
 import { addDays, subHours, subDays } from 'date-fns';
 
 export interface FoodListing {
@@ -24,6 +23,41 @@ export interface FoodListing {
   tags: string[];
   dietary: string[]; // vegetarian, vegan, contains_nuts, etc.
 }
+
+export const dietaryTags = [
+  'vegetarian',
+  'vegan',
+  'non-vegetarian',
+  'gluten-free',
+  'dairy-free',
+  'nut-free',
+  'contains-eggs',
+  'contains-nuts',
+  'contains-dairy',
+  'spicy',
+  'no onion no garlic'
+];
+
+export const foodTags = [
+  'breakfast',
+  'lunch',
+  'dinner',
+  'snacks',
+  'dessert',
+  'biryani',
+  'curry',
+  'street-food',
+  'south-indian',
+  'north-indian',
+  'chinese',
+  'continental',
+  'sweets',
+  'bakery',
+  'homemade',
+  'organic',
+  'healthy',
+  'fast-food'
+];
 
 export const mockFoodListings: FoodListing[] = [
   {
