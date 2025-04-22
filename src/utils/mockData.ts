@@ -1,19 +1,17 @@
 
-import { MapPin } from "lucide-react";
+import { addDays, subHours, subDays } from 'date-fns';
 
 export interface FoodListing {
   id: string;
   title: string;
   description: string;
   price: number | null; // null means free
-  quantity: {
-    amount: number;
-    unit: string;
-  };
+  quantity: number;
   imageUrl: string;
   location: {
-    display: string;
-    distance: number; // in km
+    display: string; // Human readable location
+    distance: number; // Distance in km
+    coordinates?: [number, number]; // [latitude, longitude]
   };
   postedAt: Date;
   seller: {
@@ -21,191 +19,243 @@ export interface FoodListing {
     name: string;
     avatar: string;
     rating: number;
+    phone?: string;
   };
   tags: string[];
-  dietary: string[];
+  dietary: string[]; // vegetarian, vegan, contains_nuts, etc.
 }
 
 export const mockFoodListings: FoodListing[] = [
   {
-    id: "1",
-    title: "Homemade Hyderabadi Biryani",
-    description: "Authentic Hyderabadi dum biryani made with basmati rice and tender chicken. Made too much for family dinner. Enough for 3-4 people.",
-    price: 250,
-    quantity: {
-      amount: 1,
-      unit: "handi"
-    },
-    imageUrl: "https://source.unsplash.com/W3SEyZODn8U",
+    id: '1',
+    title: 'Homemade Biryani',
+    description: 'Delicious homemade chicken biryani, cooked today. Can serve 3-4 people. Fragrant basmati rice with tender chicken pieces.',
+    price: 299,
+    quantity: 4,
+    imageUrl: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
     location: {
-      display: "Banjara Hills",
-      distance: 1.2
+      display: 'Himayatnagar, Hyderabad',
+      distance: 2.3,
+      coordinates: [17.4037, 78.4584]
     },
-    postedAt: new Date(Date.now() - 3600000), // 1 hour ago
+    postedAt: subHours(new Date(), 2),
     seller: {
-      id: "user1",
-      name: "Arjun R.",
-      avatar: "https://randomuser.me/api/portraits/men/44.jpg",
-      rating: 4.8
+      id: 'user1',
+      name: 'Priya S.',
+      avatar: 'https://randomuser.me/api/portraits/women/22.jpg',
+      rating: 4.8,
+      phone: '+91 9876543210'
     },
-    tags: ["homemade", "biryani", "dinner"],
-    dietary: ["non-vegetarian"]
+    tags: ['biryani', 'lunch', 'dinner', 'non-veg'],
+    dietary: ['Non-vegetarian']
   },
   {
-    id: "2",
-    title: "Osmania Biscuits",
-    description: "Freshly baked Osmania biscuits. Perfect with Irani chai. Giving away extra from my bakery.",
-    price: null, // Free
-    quantity: {
-      amount: 24,
-      unit: "pieces"
-    },
-    imageUrl: "https://source.unsplash.com/nP11TkjxJ7s",
-    location: {
-      display: "Charminar",
-      distance: 2.5
-    },
-    postedAt: new Date(Date.now() - 7200000), // 2 hours ago
-    seller: {
-      id: "user2",
-      name: "Mohammed F.",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      rating: 4.6
-    },
-    tags: ["baked", "sweet", "snack"],
-    dietary: ["vegetarian"]
-  },
-  {
-    id: "3",
-    title: "Homemade Mirchi ka Salan",
-    description: "Authentic spicy mirchi ka salan. Perfect side dish for biryani. Made extra for a family gathering.",
+    id: '2',
+    title: 'Paneer Butter Masala',
+    description: 'Fresh homemade paneer butter masala with 6 rotis. Made with organic ingredients and pure ghee. No artificial flavors.',
     price: 180,
-    quantity: {
-      amount: 500,
-      unit: "grams"
-    },
-    imageUrl: "https://source.unsplash.com/6hnDJG4dO5o",
+    quantity: 2,
+    imageUrl: 'https://images.unsplash.com/photo-1631452180539-96aca7d48617?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
     location: {
-      display: "Gachibowli",
-      distance: 3.2
+      display: 'Banjara Hills, Hyderabad',
+      distance: 4.7,
+      coordinates: [17.4156, 78.4347]
     },
-    postedAt: new Date(Date.now() - 5400000), // 1.5 hours ago
+    postedAt: subHours(new Date(), 5),
     seller: {
-      id: "user3",
-      name: "Priya S.",
-      avatar: "https://randomuser.me/api/portraits/women/67.jpg",
-      rating: 4.9
+      id: 'user2',
+      name: 'Rahul M.',
+      avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+      rating: 4.5,
+      phone: '+91 8765432109'
     },
-    tags: ["hyderabadi", "spicy", "curry"],
-    dietary: ["vegetarian"]
+    tags: ['paneer', 'dinner', 'lunch', 'curry'],
+    dietary: ['Vegetarian']
   },
   {
-    id: "4",
-    title: "Irani Chai and Samosa",
-    description: "Fresh samosas with Irani chai. Have extra from my cafe that would go to waste. Come pick up quickly!",
-    price: null, // Free
-    quantity: {
-      amount: 6,
-      unit: "servings"
-    },
-    imageUrl: "https://source.unsplash.com/y8OPPvo_7Hk",
+    id: '3',
+    title: 'Leftover Dal & Rice',
+    description: 'Fresh dal and rice from today\'s lunch. Still warm and very tasty. Free to anyone who can pick up in the next hour.',
+    price: null,
+    quantity: 1,
+    imageUrl: 'https://images.unsplash.com/photo-1546833998-877b37c2e5c6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
     location: {
-      display: "Himayat Nagar",
-      distance: 0.8
+      display: 'Ameerpet, Hyderabad',
+      distance: 1.2,
+      coordinates: [17.4375, 78.4483]
     },
-    postedAt: new Date(Date.now() - 1800000), // 30 mins ago
+    postedAt: subHours(new Date(), 1),
     seller: {
-      id: "user4",
-      name: "Rajesh K.",
-      avatar: "https://randomuser.me/api/portraits/men/55.jpg",
-      rating: 4.7
+      id: 'user3',
+      name: 'Ananya K.',
+      avatar: 'https://randomuser.me/api/portraits/women/45.jpg',
+      rating: 4.2,
+      phone: '+91 7654321098'
     },
-    tags: ["snack", "tea", "evening"],
-    dietary: ["vegetarian"]
+    tags: ['dal', 'rice', 'lunch', 'quick-pickup'],
+    dietary: ['Vegetarian']
   },
   {
-    id: "5",
-    title: "Double Ka Meetha",
-    description: "Traditional Hyderabadi dessert. Made too much for a family function. Sweet and delicious!",
-    price: 200,
-    quantity: {
-      amount: 500,
-      unit: "grams"
-    },
-    imageUrl: "https://source.unsplash.com/c3LZ-FpF8RY",
+    id: '4',
+    title: 'Homemade Gulab Jamun',
+    description: 'Freshly made gulab jamun for dessert. Made with khoya and dipped in cardamom sugar syrup. Pack of 8 pieces.',
+    price: 150,
+    quantity: 8,
+    imageUrl: 'https://images.unsplash.com/photo-1615832494873-b3556edfd726?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
     location: {
-      display: "Mehdipatnam",
-      distance: 2.8
+      display: 'Begumpet, Hyderabad',
+      distance: 3.8,
+      coordinates: [17.4422, 78.4677]
     },
-    postedAt: new Date(Date.now() - 9000000), // 2.5 hours ago
+    postedAt: subHours(new Date(), 8),
     seller: {
-      id: "user5",
-      name: "Lakshmi P.",
-      avatar: "https://randomuser.me/api/portraits/women/22.jpg",
-      rating: 4.9
+      id: 'user4',
+      name: 'Vikram S.',
+      avatar: 'https://randomuser.me/api/portraits/men/56.jpg',
+      rating: 4.9,
+      phone: '+91 6543210987'
     },
-    tags: ["dessert", "sweet", "hyderabadi"],
-    dietary: ["vegetarian", "contains dairy"]
+    tags: ['dessert', 'sweets', 'gulab-jamun'],
+    dietary: ['Vegetarian', 'Contains Sugar']
   },
   {
-    id: "6",
-    title: "Homemade Haleem",
-    description: "Authentic Hyderabadi haleem made with wheat, lentils and meat. Slow-cooked for hours. Special Ramzan recipe.",
-    price: 300,
-    quantity: {
-      amount: 750,
-      unit: "grams"
-    },
-    imageUrl: "https://source.unsplash.com/aX_ljOOyWJY",
+    id: '5',
+    title: 'Homestyle Veg Thali',
+    description: 'Complete vegetarian thali with dal, sabzi, rice, 4 rotis, pickle, and salad. Home-cooked with love and traditional spices.',
+    price: 220,
+    quantity: 2,
+    imageUrl: 'https://images.unsplash.com/photo-1567337710282-00832b415979?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
     location: {
-      display: "Tolichowki",
-      distance: 1.5
+      display: 'Secunderabad, Hyderabad',
+      distance: 5.9,
+      coordinates: [17.4399, 78.4983]
     },
-    postedAt: new Date(Date.now() - 10800000), // 3 hours ago
+    postedAt: subDays(new Date(), 1),
     seller: {
-      id: "user6",
-      name: "Imran S.",
-      avatar: "https://randomuser.me/api/portraits/men/26.jpg",
-      rating: 4.7
+      id: 'user5',
+      name: 'Meera L.',
+      avatar: 'https://randomuser.me/api/portraits/women/67.jpg',
+      rating: 4.7,
+      phone: '+91 5432109876'
     },
-    tags: ["haleem", "dinner", "ramzan"],
-    dietary: ["non-vegetarian", "contains wheat"]
+    tags: ['thali', 'lunch', 'dinner', 'complete-meal'],
+    dietary: ['Vegetarian', 'No Onion No Garlic']
+  },
+  {
+    id: '6',
+    title: 'Andhra Style Chicken Curry',
+    description: 'Spicy Andhra-style chicken curry with tender pieces of chicken. Best enjoyed with rice or roti. Serves 3 people.',
+    price: 280,
+    quantity: 3,
+    imageUrl: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+    location: {
+      display: 'Kukatpally, Hyderabad',
+      distance: 8.2,
+      coordinates: [17.4849, 78.4138]
+    },
+    postedAt: subHours(new Date(), 20),
+    seller: {
+      id: 'user6',
+      name: 'Karthik N.',
+      avatar: 'https://randomuser.me/api/portraits/men/78.jpg',
+      rating: 4.6,
+      phone: '+91 4321098765'
+    },
+    tags: ['chicken', 'curry', 'spicy', 'andhra'],
+    dietary: ['Non-vegetarian', 'Spicy']
+  },
+  {
+    id: '7',
+    title: 'Mysore Masala Dosa',
+    description: 'Crispy Mysore masala dosa with potato filling and spicy chutney spread inside. Comes with coconut chutney and sambar.',
+    price: 120,
+    quantity: 3,
+    imageUrl: 'https://images.unsplash.com/photo-1589301760014-d929f86762b1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+    location: {
+      display: 'Gachibowli, Hyderabad',
+      distance: 9.5,
+      coordinates: [17.4400, 78.3489]
+    },
+    postedAt: subDays(new Date(), 2),
+    seller: {
+      id: 'user7',
+      name: 'Lakshmi R.',
+      avatar: 'https://randomuser.me/api/portraits/women/89.jpg',
+      rating: 4.8,
+      phone: '+91 3210987654'
+    },
+    tags: ['breakfast', 'dosa', 'south-indian'],
+    dietary: ['Vegetarian']
+  },
+  {
+    id: '8',
+    title: 'Hyderabadi Chicken Haleem',
+    description: 'Authentic Hyderabadi chicken haleem, perfect for Iftar or dinner. Rich, flavorful and filling. Made fresh today.',
+    price: 320,
+    quantity: 4,
+    imageUrl: 'https://images.unsplash.com/photo-1587314168485-3236d6710a13?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+    location: {
+      display: 'Charminar, Hyderabad',
+      distance: 7.3,
+      coordinates: [17.3616, 78.4747]
+    },
+    postedAt: subHours(new Date(), 12),
+    seller: {
+      id: 'user8',
+      name: 'Farhan M.',
+      avatar: 'https://randomuser.me/api/portraits/men/92.jpg',
+      rating: 4.9,
+      phone: '+91 2109876543'
+    },
+    tags: ['haleem', 'chicken', 'hyderabadi', 'dinner'],
+    dietary: ['Non-vegetarian']
+  },
+  {
+    id: '9',
+    title: 'Homemade Veg Samosas',
+    description: 'Crispy vegetable samosas with spicy potato filling. Fresh from the kitchen. Pack of 6 pieces with mint chutney.',
+    price: 90,
+    quantity: 6,
+    imageUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+    location: {
+      display: 'Dilsukhnagar, Hyderabad',
+      distance: 6.1,
+      coordinates: [17.3687, 78.5247]
+    },
+    postedAt: subHours(new Date(), 6),
+    seller: {
+      id: 'user9',
+      name: 'Nandini P.',
+      avatar: 'https://randomuser.me/api/portraits/women/12.jpg',
+      rating: 4.5,
+      phone: '+91 1098765432'
+    },
+    tags: ['snacks', 'samosa', 'evening'],
+    dietary: ['Vegetarian']
+  },
+  {
+    id: '10',
+    title: 'Extra Wedding Food',
+    description: 'Various items from a wedding dinner including rice, curry, paneer dishes, and desserts. Free to those in need.',
+    price: null,
+    quantity: 10,
+    imageUrl: 'https://images.unsplash.com/photo-1493770348161-369560ae357d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+    location: {
+      display: 'Miyapur, Hyderabad',
+      distance: 10.8,
+      coordinates: [17.4958, 78.3856]
+    },
+    postedAt: subHours(new Date(), 4),
+    seller: {
+      id: 'user10',
+      name: 'Ramesh A.',
+      avatar: 'https://randomuser.me/api/portraits/men/42.jpg',
+      rating: 4.6,
+      phone: '+91 0987654321'
+    },
+    tags: ['wedding-food', 'variety', 'donation', 'free'],
+    dietary: ['Vegetarian', 'Non-vegetarian']
   }
 ];
 
-export const dietaryTags = [
-  "vegetarian", 
-  "vegan", 
-  "non-vegetarian",
-  "gluten-free", 
-  "dairy-free", 
-  "nut-free", 
-  "organic", 
-  "contains nuts",
-  "contains dairy",
-  "contains wheat",
-  "jain"
-];
-
-export const foodTags = [
-  "homemade", 
-  "fresh", 
-  "dinner", 
-  "lunch", 
-  "breakfast", 
-  "dessert", 
-  "healthy", 
-  "baked", 
-  "sweet", 
-  "spicy", 
-  "biryani",
-  "curry",
-  "snack", 
-  "hyderabadi",
-  "south indian",
-  "north indian",
-  "street food",
-  "haleem",
-  "ramzan",
-  "festive"
-];
+export default mockFoodListings;

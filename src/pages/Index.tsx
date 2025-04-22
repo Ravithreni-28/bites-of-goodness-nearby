@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import FoodCard from '@/components/FoodCard';
@@ -10,13 +12,16 @@ import SearchBar from '@/components/SearchBar';
 import FoodListingForm from '@/components/FoodListingForm';
 import { mockFoodListings } from '@/utils/mockData';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin, Timer, Info, IndianRupee } from 'lucide-react';
+import { MapPin, Timer, Info, IndianRupee, Search } from 'lucide-react';
 
 const Index = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("nearby");
+  const [activeTab, setActiveTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
   const handleSearch = (query: string) => {
+    setSearchQuery(query);
     toast({
       title: "Search initiated",
       description: `Searching for: ${query || "all food"}`,
@@ -29,6 +34,51 @@ const Index = () => {
       description: "Your food listing has been successfully created.",
     });
   };
+
+  const foodCategories = [
+    "All", "Breakfast", "Lunch", "Dinner", "Snacks", "Desserts", "Vegetarian", "Non-vegetarian", "Spicy", "Free"
+  ];
+
+  const filteredListings = mockFoodListings
+    .filter(listing => {
+      if (searchQuery) {
+        const searchLower = searchQuery.toLowerCase();
+        return (
+          listing.title.toLowerCase().includes(searchLower) ||
+          listing.description.toLowerCase().includes(searchLower) ||
+          listing.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
+          listing.dietary.some(item => item.toLowerCase().includes(searchLower)) ||
+          listing.location.display.toLowerCase().includes(searchLower)
+        );
+      }
+      return true;
+    })
+    .filter(listing => {
+      if (!selectedCategory || selectedCategory === "All") return true;
+      if (selectedCategory === "Free") return listing.price === null;
+      if (selectedCategory === "Vegetarian") return listing.dietary.includes("Vegetarian");
+      if (selectedCategory === "Non-vegetarian") return listing.dietary.includes("Non-vegetarian");
+      if (selectedCategory === "Spicy") return listing.dietary.includes("Spicy");
+      return listing.tags.some(tag => 
+        tag.toLowerCase() === selectedCategory.toLowerCase() || 
+        tag.toLowerCase().includes(selectedCategory.toLowerCase())
+      );
+    });
+  
+  const getSortedListings = () => {
+    switch (activeTab) {
+      case "nearby":
+        return [...filteredListings].sort((a, b) => a.location.distance - b.location.distance);
+      case "free":
+        return filteredListings.filter(listing => listing.price === null);
+      case "recent":
+        return [...filteredListings].sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());
+      default:
+        return filteredListings;
+    }
+  };
+
+  const sortedListings = getSortedListings();
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -44,11 +94,27 @@ const Index = () => {
               <SearchBar onSearch={handleSearch} />
             </div>
           </div>
+
+          <div className="mb-6 overflow-x-auto pb-2">
+            <div className="flex gap-2 min-w-max">
+              {foodCategories.map(category => (
+                <Badge 
+                  key={category}
+                  variant={selectedCategory === category || (category === "All" && !selectedCategory) ? "default" : "outline"}
+                  className="cursor-pointer px-3 py-1 text-sm"
+                  onClick={() => setSelectedCategory(category === "All" ? null : category)}
+                >
+                  {category}
+                </Badge>
+              ))}
+            </div>
+          </div>
           
           <div className="mb-8">
-            <Tabs defaultValue="nearby" className="w-full" onValueChange={setActiveTab}>
+            <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
               <div className="flex items-center justify-between">
                 <TabsList>
+                  <TabsTrigger value="all">All Food</TabsTrigger>
                   <TabsTrigger value="nearby">Nearby</TabsTrigger>
                   <TabsTrigger value="free">Free</TabsTrigger>
                   <TabsTrigger value="recent">Recent</TabsTrigger>
@@ -56,37 +122,43 @@ const Index = () => {
                 <FoodListingForm onSubmit={handleListingSubmit} />
               </div>
               
+              <TabsContent value="all" className="pt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {sortedListings.map((listing, index) => (
+                    <FoodCard 
+                      key={listing.id} 
+                      listing={listing} 
+                      featured={index === 0 && activeTab === "all"}
+                    />
+                  ))}
+                </div>
+              </TabsContent>
+              
               <TabsContent value="nearby" className="pt-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {mockFoodListings
-                    .sort((a, b) => a.location.distance - b.location.distance)
-                    .map((listing, index) => (
-                      <FoodCard 
-                        key={listing.id} 
-                        listing={listing} 
-                        featured={index === 0}
-                      />
-                    ))}
+                  {sortedListings.map((listing, index) => (
+                    <FoodCard 
+                      key={listing.id} 
+                      listing={listing} 
+                      featured={index === 0}
+                    />
+                  ))}
                 </div>
               </TabsContent>
               
               <TabsContent value="free" className="pt-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {mockFoodListings
-                    .filter(listing => listing.price === null)
-                    .map((listing) => (
-                      <FoodCard key={listing.id} listing={listing} />
-                    ))}
+                  {sortedListings.map((listing) => (
+                    <FoodCard key={listing.id} listing={listing} />
+                  ))}
                 </div>
               </TabsContent>
               
               <TabsContent value="recent" className="pt-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {mockFoodListings
-                    .sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime())
-                    .map((listing) => (
-                      <FoodCard key={listing.id} listing={listing} />
-                    ))}
+                  {sortedListings.map((listing) => (
+                    <FoodCard key={listing.id} listing={listing} />
+                  ))}
                 </div>
               </TabsContent>
             </Tabs>
@@ -120,6 +192,28 @@ const Index = () => {
                 <h3 className="text-xl font-semibold mb-2">Save Money</h3>
                 <p className="text-gray-600">Get affordable homemade food and help others earn from their surplus cooking. Everyone wins!</p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 px-4 bg-white">
+          <div className="container mx-auto max-w-4xl">
+            <h2 className="text-3xl font-bold mb-8 text-center">About Zero Waste Bites</h2>
+            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+              <p className="mb-4">
+                Zero Waste Bites is a food rescue and redistribution platform that addresses food waste by connecting individuals who have overcooked or excess food with nearby consumers looking for affordable meal options.
+              </p>
+              <p className="mb-4">
+                Our mission is to reduce food waste while providing affordable meal options and building community connections. By sharing your excess food, you're not only helping someone enjoy a delicious meal but also contributing to a more sustainable future.
+              </p>
+              <h3 className="text-xl font-semibold mb-3 mt-6">Our Objectives:</h3>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Reduce food waste in Hyderabad communities</li>
+                <li>Provide affordable meal options to those in need</li>
+                <li>Foster community connections through food sharing</li>
+                <li>Create a sustainable food ecosystem</li>
+                <li>Promote resourcefulness and mindful consumption</li>
+              </ul>
             </div>
           </div>
         </section>
