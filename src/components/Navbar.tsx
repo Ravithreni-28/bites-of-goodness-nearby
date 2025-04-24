@@ -1,17 +1,23 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { MapPin, Menu, Search, User, Plus, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { MapPin, Menu, Search, User, Plus, X, MessageSquare } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ProfileBadge from './ProfileBadge';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
   
-  // Mock authentication status - would come from auth context
-  const isLoggedIn = false;
+  const isLoggedIn = !!user;
+  
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
   
   return (
     <nav className="sticky top-0 bg-white/95 backdrop-blur-sm border-b z-50 shadow-sm py-3">
@@ -29,21 +35,28 @@ export const Navbar = () => {
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
-          <div className="flex items-center text-muted-foreground hover:text-foreground transition-colors">
-            <MapPin className="h-4 w-4 mr-1" />
-            <span>Hyderabad, Telangana</span>
-          </div>
+          {profile && (
+            <div className="flex items-center text-muted-foreground hover:text-foreground transition-colors">
+              <MapPin className="h-4 w-4 mr-1" />
+              <span>{profile.address || 'Set your location'}</span>
+            </div>
+          )}
           <Button variant="outline" className="flex items-center">
             <Search className="h-4 w-4 mr-2" />
             <span>Search</span>
           </Button>
-          <Link to={isLoggedIn ? "/dashboard" : "/login"}>
+          <Link to={isLoggedIn ? "/create-listing" : "/login"}>
             <Button variant="default" className="bg-[#FF9933] hover:bg-[#FF8800] flex items-center">
               <Plus className="h-4 w-4 mr-2" />
               <span>Share Food</span>
             </Button>
           </Link>
-          <ProfileBadge isLoggedIn={isLoggedIn} />
+          <ProfileBadge 
+            isLoggedIn={isLoggedIn} 
+            userName={profile?.full_name || ''} 
+            userAvatar={profile?.avatar_url || ''}
+            onSignOut={handleSignOut}
+          />
         </div>
         
         {/* Mobile menu button */}
@@ -65,28 +78,54 @@ export const Navbar = () => {
                 </Link>
               </div>
               <div className="space-y-3 px-2">
-                <div className="flex items-center py-2 hover:bg-muted rounded-md px-2">
-                  <MapPin className="h-5 w-5 mr-3" />
-                  <span>Change Location</span>
-                </div>
+                {isLoggedIn && (
+                  <div className="flex items-center py-2 rounded-md px-2">
+                    <MapPin className="h-5 w-5 mr-3" />
+                    <span>{profile?.address || 'Set your location'}</span>
+                  </div>
+                )}
                 <Link to="/search" className="block">
                   <div className="flex items-center py-2 hover:bg-muted rounded-md px-2">
                     <Search className="h-5 w-5 mr-3" />
                     <span>Search Food</span>
                   </div>
                 </Link>
-                <Link to={isLoggedIn ? "/dashboard" : "/login"} className="block">
+                <Link to={isLoggedIn ? "/create-listing" : "/login"} className="block">
                   <div className="flex items-center py-2 hover:bg-muted rounded-md px-2">
                     <Plus className="h-5 w-5 mr-3" />
                     <span>Share Food</span>
                   </div>
                 </Link>
-                <Link to={isLoggedIn ? "/dashboard" : "/login"} className="block">
-                  <div className="flex items-center py-2 hover:bg-muted rounded-md px-2">
-                    <User className="h-5 w-5 mr-3" />
-                    <span>{isLoggedIn ? "Dashboard" : "Login / Sign Up"}</span>
-                  </div>
-                </Link>
+                {isLoggedIn ? (
+                  <>
+                    <Link to="/dashboard" className="block">
+                      <div className="flex items-center py-2 hover:bg-muted rounded-md px-2">
+                        <User className="h-5 w-5 mr-3" />
+                        <span>Dashboard</span>
+                      </div>
+                    </Link>
+                    <Link to="/messages" className="block">
+                      <div className="flex items-center py-2 hover:bg-muted rounded-md px-2">
+                        <MessageSquare className="h-5 w-5 mr-3" />
+                        <span>Messages</span>
+                      </div>
+                    </Link>
+                    <div 
+                      className="flex items-center py-2 hover:bg-muted rounded-md px-2 cursor-pointer"
+                      onClick={handleSignOut}
+                    >
+                      <X className="h-5 w-5 mr-3" />
+                      <span>Sign Out</span>
+                    </div>
+                  </>
+                ) : (
+                  <Link to="/login" className="block">
+                    <div className="flex items-center py-2 hover:bg-muted rounded-md px-2">
+                      <User className="h-5 w-5 mr-3" />
+                      <span>Login / Sign Up</span>
+                    </div>
+                  </Link>
+                )}
               </div>
             </div>
           </SheetContent>

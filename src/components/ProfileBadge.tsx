@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { User } from 'lucide-react';
+import { User, Settings, LogOut, PlusCircle, MessageSquare, ShoppingBag, Heart } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,12 +16,14 @@ interface ProfileBadgeProps {
   isLoggedIn?: boolean;
   userName?: string;
   userAvatar?: string;
+  onSignOut?: () => void;
 }
 
 export const ProfileBadge = ({ 
   isLoggedIn = false, 
   userName = "Guest User", 
-  userAvatar 
+  userAvatar,
+  onSignOut
 }: ProfileBadgeProps) => {
   if (!isLoggedIn) {
     return (
@@ -55,26 +57,42 @@ export const ProfileBadge = ({
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>
           <p className="font-medium">{userName}</p>
-          <p className="text-xs text-muted-foreground">example@email.com</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <Link to="/dashboard">
-          <DropdownMenuItem>Dashboard</DropdownMenuItem>
+          <DropdownMenuItem>
+            <User className="h-4 w-4 mr-2" /> Dashboard
+          </DropdownMenuItem>
         </Link>
-        <Link to="/dashboard?tab=myListings">
-          <DropdownMenuItem>My Listings</DropdownMenuItem>
+        <Link to="/create-listing">
+          <DropdownMenuItem>
+            <PlusCircle className="h-4 w-4 mr-2" /> Share Food
+          </DropdownMenuItem>
         </Link>
-        <Link to="/dashboard?tab=saved">
-          <DropdownMenuItem>Saved Items</DropdownMenuItem>
+        <Link to="/messages">
+          <DropdownMenuItem>
+            <MessageSquare className="h-4 w-4 mr-2" /> Messages
+          </DropdownMenuItem>
         </Link>
-        <Link to="/dashboard?tab=messages">
-          <DropdownMenuItem>Messages</DropdownMenuItem>
+        <Link to="/saved">
+          <DropdownMenuItem>
+            <Heart className="h-4 w-4 mr-2" /> Saved Items
+          </DropdownMenuItem>
+        </Link>
+        <Link to="/transactions">
+          <DropdownMenuItem>
+            <ShoppingBag className="h-4 w-4 mr-2" /> Transactions
+          </DropdownMenuItem>
         </Link>
         <DropdownMenuSeparator />
         <Link to="/settings">
-          <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuItem>
+            <Settings className="h-4 w-4 mr-2" /> Settings
+          </DropdownMenuItem>
         </Link>
-        <DropdownMenuItem>Log out</DropdownMenuItem>
+        <DropdownMenuItem onClick={onSignOut}>
+          <LogOut className="h-4 w-4 mr-2" /> Log out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
