@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-  async function signIn(email: string, password: string) {
+  async function signIn(email: string, password: string): Promise<void> {
     try {
       setIsLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "Welcome back to ZeroWasteBites!",
       });
       
-      return data;
+      // We don't return data here to match the Promise<void> return type
     } catch (error: any) {
       toast({
         title: "Login failed",
@@ -106,7 +106,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-  async function signUp(email: string, password: string, userData: { username: string; full_name: string }) {
+  async function signUp(email: string, password: string, userData: { username: string; full_name: string }): Promise<void> {
     try {
       setIsLoading(true);
       const { data, error } = await supabase.auth.signUp({
@@ -129,7 +129,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "Welcome to ZeroWasteBites!",
       });
       
-      return data;
+      // We don't return data here to match the Promise<void> return type
     } catch (error: any) {
       toast({
         title: "Registration failed",
@@ -142,7 +142,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-  async function signOut() {
+  async function signOut(): Promise<void> {
     try {
       setIsLoading(true);
       const { error } = await supabase.auth.signOut();
@@ -166,7 +166,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-  async function updateProfile(data: any) {
+  async function updateProfile(data: any): Promise<void> {
     try {
       setIsLoading(true);
       
@@ -199,7 +199,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-  const value = {
+  const value: AuthContextType = {
     session,
     user,
     profile,
