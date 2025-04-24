@@ -12,6 +12,13 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import CreateListing from "./pages/CreateListing";
+import ListingDetails from "./pages/ListingDetails";
+import MapLocation from "./pages/MapLocation";
+import UserProfile from "./pages/UserProfile";
+import Messages from "./pages/Messages";
+import TransactionHistory from "./pages/TransactionHistory";
+import TransactionDetails from "./pages/TransactionDetails";
+import AuthOptions from "./pages/AuthOptions";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +31,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/auth-options" element={<AuthOptions />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route 
@@ -39,6 +47,47 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <CreateListing />
+                </ProtectedRoute>
+              } 
+            />
+            <Route path="/listing/:id" element={<ListingDetails />} />
+            <Route 
+              path="/map/:id" 
+              element={
+                <ProtectedRoute>
+                  <MapLocation />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <UserProfile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/messages" 
+              element={
+                <ProtectedRoute>
+                  <Messages />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/transactions" 
+              element={
+                <ProtectedRoute>
+                  <TransactionHistory />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/transaction/:id" 
+              element={
+                <ProtectedRoute>
+                  <TransactionDetails />
                 </ProtectedRoute>
               } 
             />

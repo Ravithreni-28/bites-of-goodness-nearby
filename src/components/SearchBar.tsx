@@ -17,11 +17,28 @@ interface SearchBarProps {
 
 export const SearchBar = ({ onSearch, additionalClasses = '' }: SearchBarProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [priceFilter, setPriceFilter] = useState("all");
+  const [distanceFilter, setDistanceFilter] = useState("5km");
+  const [selectedDietaryTags, setSelectedDietaryTags] = useState<string[]>([]);
   
   const handleSearch = () => {
     if (onSearch) {
       onSearch(searchQuery);
     }
+  };
+
+  const handleDietaryTagToggle = (tag: string) => {
+    setSelectedDietaryTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+  
+  const handleReset = () => {
+    setPriceFilter("all");
+    setDistanceFilter("5km");
+    setSelectedDietaryTags([]);
   };
   
   return (
@@ -53,7 +70,10 @@ export const SearchBar = ({ onSearch, additionalClasses = '' }: SearchBarProps) 
             <div className="space-y-4">
               <div>
                 <h4 className="font-medium mb-2">Price</h4>
-                <RadioGroup defaultValue="all">
+                <RadioGroup 
+                  value={priceFilter} 
+                  onValueChange={setPriceFilter}
+                >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="all" id="all" />
                     <Label htmlFor="all">All prices</Label>
@@ -76,7 +96,11 @@ export const SearchBar = ({ onSearch, additionalClasses = '' }: SearchBarProps) 
                 <div className="grid grid-cols-2 gap-2">
                   {dietaryTags.slice(0, 6).map((tag) => (
                     <div key={tag} className="flex items-center space-x-2">
-                      <Checkbox id={`diet-${tag}`} />
+                      <Checkbox 
+                        id={`diet-${tag}`} 
+                        checked={selectedDietaryTags.includes(tag)}
+                        onCheckedChange={() => handleDietaryTagToggle(tag)}
+                      />
                       <Label htmlFor={`diet-${tag}`} className="text-sm capitalize">
                         {tag}
                       </Label>
@@ -89,7 +113,10 @@ export const SearchBar = ({ onSearch, additionalClasses = '' }: SearchBarProps) 
               
               <div>
                 <h4 className="font-medium mb-2">Distance</h4>
-                <RadioGroup defaultValue="5km">
+                <RadioGroup 
+                  value={distanceFilter} 
+                  onValueChange={setDistanceFilter}
+                >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="1km" id="1km" />
                     <Label htmlFor="1km">Within 1 km</Label>
@@ -106,8 +133,18 @@ export const SearchBar = ({ onSearch, additionalClasses = '' }: SearchBarProps) 
               </div>
               
               <div className="pt-2 flex justify-between">
-                <Button variant="outline" size="sm">Reset</Button>
-                <Button size="sm" className="bg-eco-green hover:bg-eco-green-dark">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleReset}
+                >
+                  Reset
+                </Button>
+                <Button 
+                  size="sm" 
+                  className="bg-blue-600 hover:bg-blue-700"
+                  onClick={handleSearch}
+                >
                   Apply Filters
                 </Button>
               </div>
@@ -116,7 +153,7 @@ export const SearchBar = ({ onSearch, additionalClasses = '' }: SearchBarProps) 
         </Popover>
         
         <Button 
-          className="bg-eco-green hover:bg-eco-green-dark" 
+          className="bg-blue-600 hover:bg-blue-700" 
           onClick={handleSearch}
         >
           Search
