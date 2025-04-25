@@ -1,16 +1,17 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, Menu, Search, User, Plus, X, MessageSquare } from 'lucide-react';
+import { MapPin, Menu, Search, User, Plus, X, MessageSquare, ShoppingCart } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ProfileBadge from './ProfileBadge';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCartStore } from '@/stores/useCartStore';
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const { items } = useCartStore();
   
   const isLoggedIn = !!user;
   
@@ -22,7 +23,6 @@ export const Navbar = () => {
   return (
     <nav className="sticky top-0 bg-white/95 backdrop-blur-sm border-b z-50 shadow-sm py-3">
       <div className="container mx-auto px-4 flex items-center justify-between">
-        {/* Logo */}
         <div className="flex items-center">
           <Link to="/">
             <span className="text-2xl font-bold">
@@ -33,7 +33,6 @@ export const Navbar = () => {
           </Link>
         </div>
         
-        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
           {profile && (
             <div className="flex items-center text-muted-foreground hover:text-foreground transition-colors">
@@ -51,6 +50,16 @@ export const Navbar = () => {
               <span>Share Food</span>
             </Button>
           </Link>
+          <Link to="/cart" className="relative">
+            <Button variant="ghost" size="icon">
+              <ShoppingCart className="h-5 w-5" />
+              {items.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {items.length}
+                </span>
+              )}
+            </Button>
+          </Link>
           <ProfileBadge 
             isLoggedIn={isLoggedIn} 
             userName={profile?.full_name || ''} 
@@ -59,7 +68,6 @@ export const Navbar = () => {
           />
         </div>
         
-        {/* Mobile menu button */}
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="ghost" className="md:hidden" size="icon">

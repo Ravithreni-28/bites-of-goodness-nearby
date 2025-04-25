@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,7 @@ import Messages from "./pages/Messages";
 import TransactionHistory from "./pages/TransactionHistory";
 import TransactionDetails from "./pages/TransactionDetails";
 import AuthOptions from "./pages/AuthOptions";
+import Cart from "./components/Cart";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +88,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <TransactionDetails />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/cart" 
+              element={
+                <ProtectedRoute>
+                  <Cart />
                 </ProtectedRoute>
               } 
             />

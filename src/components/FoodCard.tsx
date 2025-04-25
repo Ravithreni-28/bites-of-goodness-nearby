@@ -33,7 +33,7 @@ interface FoodCardProps {
   featured?: boolean;
 }
 
-export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
+const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
   const { 
     title, 
     description, 
@@ -51,7 +51,7 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
   const formattedTime = formatDistance(postedAt, new Date(), { addSuffix: true });
 
   return (
-    <Card className={`overflow-hidden hover-scale ${featured ? 'border-eco-green border-2' : ''}`}>
+    <Card className={`overflow-hidden transition-shadow hover:shadow-lg ${featured ? 'col-span-2' : ''}`}>
       <div className="relative pb-[60%] overflow-hidden">
         <img 
           src={imageUrl} 
@@ -187,24 +187,15 @@ export const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
         </div>
       </CardContent>
 
-      <CardFooter className="pt-0 flex items-center justify-between">
-        <div className="flex items-center">
-          <Avatar className="h-6 w-6 mr-2">
-            <AvatarImage src={seller.avatar} alt={seller.name} />
-            <AvatarFallback>{seller.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div className="flex items-center text-sm">
-            <span className="mr-1">{seller.name}</span>
-            <span className="flex items-center text-amber-500">
-              <Star className="h-3 w-3 fill-current text-amber-500" />
-              <span className="ml-0.5">{seller.rating}</span>
-            </span>
-          </div>
+      <CardFooter className="flex justify-between items-center">
+        <div className="text-2xl font-bold text-gray-900">
+          ₹{listing.price}
         </div>
-        <div className="text-xs text-muted-foreground flex items-center">
-          <Clock className="h-3 w-3 mr-1" />
-          {formattedTime}
-        </div>
+        <AddToCartButton 
+          listingId={listing.id} 
+          title={listing.title} 
+          price={listing.price}
+        />
       </CardFooter>
     </Card>
   );
