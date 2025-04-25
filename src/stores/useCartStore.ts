@@ -46,15 +46,17 @@ export const useCartStore = create<CartStore>((set, get) => ({
 
       if (error) throw error;
 
-      const cartItems = data.map(item => ({
-        id: item.id,
-        listing_id: item.listing_id,
-        quantity: item.quantity,
-        title: item.food_listings.title,
-        price: item.food_listings.price
-      }));
+      if (data) {
+        const cartItems = data.map(item => ({
+          id: item.id,
+          listing_id: item.listing_id,
+          quantity: item.quantity,
+          title: item.food_listings.title,
+          price: item.food_listings.price
+        }));
 
-      set({ items: cartItems });
+        set({ items: cartItems });
+      }
     } catch (error) {
       console.error('Error fetching cart:', error);
     } finally {
@@ -74,20 +76,22 @@ export const useCartStore = create<CartStore>((set, get) => ({
           listing_id: listingId,
           quantity: 1
         })
-        .select()
+        .select('id')
         .single();
 
       if (error) throw error;
 
-      const newItem = {
-        id: data.id,
-        listing_id: listingId,
-        quantity: 1,
-        title,
-        price
-      };
+      if (data) {
+        const newItem = {
+          id: data.id,
+          listing_id: listingId,
+          quantity: 1,
+          title,
+          price
+        };
 
-      set({ items: [...get().items, newItem] });
+        set({ items: [...get().items, newItem] });
+      }
     } catch (error) {
       console.error('Error adding item to cart:', error);
     }

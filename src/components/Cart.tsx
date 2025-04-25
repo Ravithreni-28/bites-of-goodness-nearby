@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useCartStore } from '@/stores/useCartStore';
@@ -47,7 +46,6 @@ export const Cart = () => {
 
       if (orderError) throw orderError;
 
-      // Create order items
       const orderItems = items.map(item => ({
         order_id: order.id,
         listing_id: item.listing_id,
@@ -61,11 +59,12 @@ export const Cart = () => {
 
       if (itemsError) throw itemsError;
 
-      // Clear cart items from database
-      await supabase
+      const { error: deleteError } = await supabase
         .from('cart_items')
         .delete()
         .eq('user_id', user.id);
+
+      if (deleteError) throw deleteError;
 
       useCartStore.getState().clearCart();
 

@@ -27,6 +27,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import type { FoodListing } from '@/utils/mockData';
+import { AddToCartButton } from './AddToCartButton';
 
 interface FoodCardProps {
   listing: FoodListing;
