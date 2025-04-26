@@ -1,153 +1,194 @@
-import { useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { useCartStore } from '@/stores/useCartStore';
-import { useToast } from '@/hooks/use-toast';
+import { useCartStore } from "@/stores/useCartStore";
+import { MinusIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { formatCurrency } from "@/utils/format";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 
-export const Cart = () => {
-  const { items, isLoading, fetchCart, removeItem, updateQuantity } = useCartStore();
+const Cart = () => {
+  const { items, removeItem, updateItemQuantity, clearCart } = useCartStore();
+  const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (user) {
-      fetchCart();
-    }
-  }, [user, fetchCart]);
-
-  const calculateTotal = () => {
-    return items.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
+  const total = items.reduce(
+    (sum, item) => sum + item.price * item.quantity, 
+    0
+  );
 
   const handleCheckout = async () => {
     if (!user) {
       toast({
-        title: "Authentication required",
-        description: "Please log in to complete your purchase",
-        variant: "destructive"
+        title: "Please sign in",
+        description: "You need to sign in to complete your purchase",
+        variant: "destructive",
       });
       navigate('/login');
       return;
     }
 
     try {
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          user_id: user.id,
-          total_amount: calculateTotal(),
-          status: 'pending'
-        })
-        .select()
-        .single();
+      setIsProcessing(true);
 
+      // Create stored procedure to handle this transaction
+      const { data: order, error: orderError } = await supabase.rpc('create_order', {
+        user_id_input: user.id,
+        total_amount_input: total,
+        order_items_input: items.map(item => ({
+          listing_id: item.listing_id,
+          quantity: item.quantity,
+          price_per_unit: item.price
+        }))
+      });
+      
       if (orderError) throw orderError;
-
-      const orderItems = items.map(item => ({
-        order_id: order.id,
-        listing_id: item.listing_id,
-        quantity: item.quantity,
-        price_per_unit: item.price
-      }));
-
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) throw itemsError;
-
-      const { error: deleteError } = await supabase
-        .from('cart_items')
-        .delete()
-        .eq('user_id', user.id);
-
-      if (deleteError) throw deleteError;
-
-      useCartStore.getState().clearCart();
 
       toast({
         title: "Order placed successfully!",
-        description: "Your order has been confirmed and is being processed."
+        description: "Thank you for your purchase.",
       });
-
-      navigate('/orders');
-    } catch (error) {
-      console.error('Error during checkout:', error);
+      
+      clearCart();
+      navigate('/transactions');
+      
+    } catch (error: any) {
+      console.error("Checkout error:", error);
       toast({
         title: "Checkout failed",
-        description: "There was an error processing your order. Please try again.",
-        variant: "destructive"
+        description: error.message || "There was a problem processing your order",
+        variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  if (isLoading) {
-    return <div className="p-4">Loading cart...</div>;
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <div className="text-center p-8 max-w-md mx-auto">
+          <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
+          <p className="text-gray-600 mb-6">
+            Looks like you haven't added any items to your cart yet.
+          </p>
+          <Button onClick={() => navigate('/')}>
+            Browse Food Listings
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-bold mb-6">Shopping Cart</h2>
-      
-      {items.length === 0 ? (
-        <p className="text-gray-500">Your cart is empty</p>
-      ) : (
-        <>
-          <div className="space-y-4">
-            {items.map((item) => (
-              <div key={item.listing_id} className="flex items-center justify-between border-b pb-4">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
+        
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          {items.map((item) => (
+            <div 
+              key={item.listing_id}
+              className="flex items-center justify-between py-4 border-b last:border-b-0"
+            >
+              <div className="flex items-center gap-4">
+                {item.image_url && (
+                  <img 
+                    src={item.image_url} 
+                    alt={item.title}
+                    className="w-16 h-16 object-cover rounded-md"
+                  />
+                )}
                 <div>
-                  <h3 className="font-semibold">{item.title}</h3>
-                  <p className="text-gray-600">₹{item.price} × {item.quantity}</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => updateQuantity(item.listing_id, Math.max(1, item.quantity - 1))}
-                    >
-                      -
-                    </Button>
-                    <span>{item.quantity}</span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => updateQuantity(item.listing_id, item.quantity + 1)}
-                    >
-                      +
-                    </Button>
-                  </div>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => removeItem(item.listing_id)}
-                  >
-                    Remove
-                  </Button>
+                  <h3 className="font-medium">{item.title}</h3>
+                  <p className="text-gray-600">{formatCurrency(item.price)} per item</p>
                 </div>
               </div>
-            ))}
-          </div>
-          
-          <div className="mt-6 pt-4 border-t">
-            <div className="flex justify-between items-center mb-4">
-              <span className="font-semibold">Total:</span>
-              <span className="text-xl font-bold">₹{calculateTotal()}</span>
+              
+              <div className="flex items-center gap-4">
+                <div className="flex items-center border rounded-md">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-8 w-8 rounded-none"
+                    onClick={() => {
+                      if (item.quantity > 1) {
+                        updateItemQuantity(item.listing_id, item.quantity - 1);
+                      }
+                    }}
+                    disabled={item.quantity <= 1}
+                  >
+                    <MinusIcon className="h-4 w-4" />
+                  </Button>
+                  <span className="w-8 text-center">{item.quantity}</span>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-8 w-8 rounded-none"
+                    onClick={() => updateItemQuantity(item.listing_id, item.quantity + 1)}
+                  >
+                    <PlusIcon className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <div className="w-20 text-right font-medium">
+                  {formatCurrency(item.price * item.quantity)}
+                </div>
+                
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  onClick={() => removeItem(item.listing_id)}
+                >
+                  <TrashIcon className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
+          ))}
+          
+          <div className="mt-6 border-t pt-4">
+            <div className="flex justify-between text-lg font-semibold">
+              <span>Total</span>
+              <span>{formatCurrency(total)}</span>
+            </div>
+            <p className="text-sm text-gray-500 mt-1">
+              Taxes and delivery fees calculated at checkout
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex justify-between">
+          <Button 
+            variant="outline"
+            onClick={() => navigate('/')}
+          >
+            Continue Shopping
+          </Button>
+          
+          <div className="space-x-3">
+            <Button 
+              variant="outline"
+              onClick={() => clearCart()}
+              className="border-red-200 text-red-500 hover:bg-red-50"
+            >
+              Clear Cart
+            </Button>
             
             <Button 
-              className="w-full"
               onClick={handleCheckout}
+              disabled={isProcessing}
+              className="bg-green-600 hover:bg-green-700"
             >
-              Proceed to Checkout
+              {isProcessing ? "Processing..." : "Checkout"}
             </Button>
           </div>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 };

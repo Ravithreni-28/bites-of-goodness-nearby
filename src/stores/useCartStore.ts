@@ -1,143 +1,132 @@
 
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "sonner";
+import type { Tables } from '@/integrations/supabase/types';
 
-interface CartItem {
+export type CartItem = {
   id: string;
-  listing_id: string;
-  quantity: number;
   title: string;
   price: number;
-}
+  quantity: number;
+  image_url?: string | null;
+  listing_id: string;
+};
 
-interface CartStore {
+type CartStore = {
   items: CartItem[];
-  isLoading: boolean;
-  addItem: (listingId: string, title: string, price: number) => Promise<void>;
-  removeItem: (listingId: string) => Promise<void>;
-  updateQuantity: (listingId: string, quantity: number) => Promise<void>;
-  fetchCart: () => Promise<void>;
+  loading: boolean;
+  addItem: (item: CartItem) => void;
+  removeItem: (id: string) => void;
+  updateItemQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-}
+  saveCartToDatabase: (userId: string) => Promise<void>;
+  loadCartFromDatabase: (userId: string) => Promise<void>;
+};
 
 export const useCartStore = create<CartStore>((set, get) => ({
   items: [],
-  isLoading: false,
-
-  fetchCart: async () => {
-    const { data: session } = await supabase.auth.getSession();
-    if (!session?.session?.user) return;
-
-    set({ isLoading: true });
+  loading: false,
+  
+  addItem: (item) => {
+    set((state) => {
+      const existingItem = state.items.find((i) => i.listing_id === item.listing_id);
+      
+      if (existingItem) {
+        return {
+          items: state.items.map((i) =>
+            i.listing_id === item.listing_id
+              ? { ...i, quantity: i.quantity + item.quantity }
+              : i
+          ),
+        };
+      } else {
+        return { items: [...state.items, item] };
+      }
+    });
+  },
+  
+  removeItem: (id) => {
+    set((state) => ({
+      items: state.items.filter((item) => item.listing_id !== id),
+    }));
+  },
+  
+  updateItemQuantity: (id, quantity) => {
+    set((state) => ({
+      items: state.items.map((item) =>
+        item.listing_id === id ? { ...item, quantity } : item
+      ),
+    }));
+  },
+  
+  clearCart: () => {
+    set({ items: [] });
+  },
+  
+  saveCartToDatabase: async (userId) => {
     try {
-      const { data, error } = await supabase
-        .from('cart_items')
-        .select(`
-          id,
-          listing_id,
-          quantity,
-          food_listings (
-            title,
-            price
-          )
-        `)
-        .eq('user_id', session.session.user.id);
-
-      if (error) throw error;
-
-      if (data) {
-        const cartItems = data.map(item => ({
+      set({ loading: true });
+      
+      // First, delete existing cart items for this user
+      await supabase.rpc('delete_user_cart_items', { user_id_param: userId });
+      
+      // Now add the current items
+      const { items } = get();
+      
+      if (items.length > 0) {
+        const cartItems = items.map(item => ({
+          user_id: userId,
+          listing_id: item.listing_id,
+          quantity: item.quantity
+        }));
+        
+        const { error } = await supabase.rpc('insert_cart_items', { 
+          items_param: cartItems 
+        });
+        
+        if (error) throw error;
+        
+        toast.success("Cart saved successfully");
+      }
+    } catch (error: any) {
+      console.error('Error saving cart:', error);
+      toast.error(`Failed to save cart: ${error.message}`);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  
+  loadCartFromDatabase: async (userId) => {
+    try {
+      set({ loading: true });
+      
+      // Clear the current cart first
+      set({ items: [] });
+      
+      const { data: cartItems, error: cartError } = await supabase.rpc('get_cart_with_listings', {
+        user_id_param: userId
+      });
+      
+      if (cartError) throw cartError;
+      
+      if (cartItems && cartItems.length > 0) {
+        const formattedItems = cartItems.map((item: any) => ({
           id: item.id,
           listing_id: item.listing_id,
+          title: item.title,
+          price: item.price,
           quantity: item.quantity,
-          title: item.food_listings.title,
-          price: item.food_listings.price
+          image_url: item.image_url
         }));
-
-        set({ items: cartItems });
+        
+        set({ items: formattedItems });
       }
-    } catch (error) {
-      console.error('Error fetching cart:', error);
+    } catch (error: any) {
+      console.error('Error loading cart:', error);
+      toast.error(`Failed to load cart: ${error.message}`);
     } finally {
-      set({ isLoading: false });
+      set({ loading: false });
     }
-  },
-
-  addItem: async (listingId, title, price) => {
-    const { data: session } = await supabase.auth.getSession();
-    if (!session?.session?.user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('cart_items')
-        .insert({
-          user_id: session.session.user.id,
-          listing_id: listingId,
-          quantity: 1
-        })
-        .select('id')
-        .single();
-
-      if (error) throw error;
-
-      if (data) {
-        const newItem = {
-          id: data.id,
-          listing_id: listingId,
-          quantity: 1,
-          title,
-          price
-        };
-
-        set({ items: [...get().items, newItem] });
-      }
-    } catch (error) {
-      console.error('Error adding item to cart:', error);
-    }
-  },
-
-  removeItem: async (listingId) => {
-    const { data: session } = await supabase.auth.getSession();
-    if (!session?.session?.user) return;
-
-    try {
-      const { error } = await supabase
-        .from('cart_items')
-        .delete()
-        .eq('listing_id', listingId)
-        .eq('user_id', session.session.user.id);
-
-      if (error) throw error;
-
-      set({ items: get().items.filter(item => item.listing_id !== listingId) });
-    } catch (error) {
-      console.error('Error removing item from cart:', error);
-    }
-  },
-
-  updateQuantity: async (listingId, quantity) => {
-    const { data: session } = await supabase.auth.getSession();
-    if (!session?.session?.user) return;
-
-    try {
-      const { error } = await supabase
-        .from('cart_items')
-        .update({ quantity })
-        .eq('listing_id', listingId)
-        .eq('user_id', session.session.user.id);
-
-      if (error) throw error;
-
-      set({
-        items: get().items.map(item =>
-          item.listing_id === listingId ? { ...item, quantity } : item
-        )
-      });
-    } catch (error) {
-      console.error('Error updating quantity:', error);
-    }
-  },
-
-  clearCart: () => set({ items: [] })
+  }
 }));

@@ -109,6 +109,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   async function signUp(email: string, password: string, userData: { username: string; full_name: string }): Promise<void> {
     try {
       setIsLoading(true);
+      
+      // First check if username already exists
+      const { data: existingUser, error: checkError } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('username', userData.username)
+        .maybeSingle();
+      
+      if (checkError) {
+        console.error('Error checking username:', checkError);
+      }
+      
+      if (existingUser) {
+        throw new Error('Username already taken. Please choose another username.');
+      }
+      
+      // Proceed with signup if username is available
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -124,12 +141,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw error;
       }
       
+      // Create profile manually if needed (as a fallback)
+      if (data.user && !data.user.identities?.length) {
+        // Create profile record manually if the user already exists
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            username: userData.username,
+            full_name: userData.full_name,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+          
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+        }
+      }
+      
       toast({
         title: "Registration successful",
         description: "Welcome to ZeroWasteBites!",
       });
       
-      // We don't return data here to match the Promise<void> return type
     } catch (error: any) {
       toast({
         title: "Registration failed",
