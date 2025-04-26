@@ -2,7 +2,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
-import type { Tables } from '@/integrations/supabase/types';
 
 export type CartItem = {
   id: string;
@@ -12,6 +11,12 @@ export type CartItem = {
   image_url?: string | null;
   listing_id: string;
 };
+
+interface CartItemDB {
+  user_id: string;
+  listing_id: string;
+  quantity: number;
+}
 
 type CartStore = {
   items: CartItem[];
@@ -75,7 +80,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
       const { items } = get();
       
       if (items.length > 0) {
-        const cartItems = items.map(item => ({
+        const cartItems: CartItemDB[] = items.map(item => ({
           user_id: userId,
           listing_id: item.listing_id,
           quantity: item.quantity
@@ -111,7 +116,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
       if (cartError) throw cartError;
       
       if (cartItems && cartItems.length > 0) {
-        const formattedItems = cartItems.map((item: any) => ({
+        const formattedItems: CartItem[] = cartItems.map((item: any) => ({
           id: item.id,
           listing_id: item.listing_id,
           title: item.title,

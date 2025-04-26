@@ -1,10 +1,10 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/useCartStore";
 import { MinusIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { formatCurrency } from "@/utils/format";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from '@/integrations/supabase/client';
@@ -12,7 +12,6 @@ import { supabase } from '@/integrations/supabase/client';
 const Cart = () => {
   const { items, removeItem, updateItemQuantity, clearCart } = useCartStore();
   const [isProcessing, setIsProcessing] = useState(false);
-  const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -23,11 +22,7 @@ const Cart = () => {
 
   const handleCheckout = async () => {
     if (!user) {
-      toast({
-        title: "Please sign in",
-        description: "You need to sign in to complete your purchase",
-        variant: "destructive",
-      });
+      toast.error("You need to sign in to complete your purchase");
       navigate('/login');
       return;
     }
@@ -48,21 +43,14 @@ const Cart = () => {
       
       if (orderError) throw orderError;
 
-      toast({
-        title: "Order placed successfully!",
-        description: "Thank you for your purchase.",
-      });
+      toast.success("Thank you for your purchase.");
       
       clearCart();
       navigate('/transactions');
       
     } catch (error: any) {
       console.error("Checkout error:", error);
-      toast({
-        title: "Checkout failed",
-        description: error.message || "There was a problem processing your order",
-        variant: "destructive",
-      });
+      toast.error(error.message || "There was a problem processing your order");
     } finally {
       setIsProcessing(false);
     }
