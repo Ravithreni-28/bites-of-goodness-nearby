@@ -30,18 +30,32 @@ const Cart = () => {
     try {
       setIsProcessing(true);
 
-      // Create stored procedure to handle this transaction
-      const { data: order, error: orderError } = await supabase.rpc('create_order', {
-        user_id_input: user.id,
-        total_amount_input: total,
-        order_items_input: items.map(item => ({
-          listing_id: item.listing_id,
-          quantity: item.quantity,
-          price_per_unit: item.price
-        }))
-      });
+      // Process the order directly with database insert since create_order function doesn't exist
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          total_amount: total,
+          status: 'pending'
+        })
+        .select('id')
+        .single();
       
       if (orderError) throw orderError;
+
+      // Add order items
+      const orderItems = items.map(item => ({
+        order_id: orderData.id,
+        listing_id: item.listing_id,
+        quantity: item.quantity,
+        price_per_unit: item.price
+      }));
+
+      const { error: orderItemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (orderItemsError) throw orderItemsError;
 
       toast.success("Thank you for your purchase.");
       

@@ -1,11 +1,11 @@
 
 /**
- * Format a number as currency (USD by default)
+ * Format a number as currency (INR by default)
  */
 export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'INR',
     minimumFractionDigits: 2,
   }).format(amount);
 };

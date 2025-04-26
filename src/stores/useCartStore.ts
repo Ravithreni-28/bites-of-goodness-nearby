@@ -74,7 +74,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
       set({ loading: true });
       
       // First, delete existing cart items for this user
-      await supabase.rpc('delete_user_cart_items', { user_id_param: userId });
+      await supabase.from('cart_items').delete().eq('user_id', userId);
       
       // Now add the current items
       const { items } = get();
@@ -86,9 +86,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
           quantity: item.quantity
         }));
         
-        const { error } = await supabase.rpc('insert_cart_items', { 
-          items_param: cartItems 
-        });
+        const { error } = await supabase.from('cart_items').insert(cartItems);
         
         if (error) throw error;
         
@@ -109,20 +107,25 @@ export const useCartStore = create<CartStore>((set, get) => ({
       // Clear the current cart first
       set({ items: [] });
       
-      const { data: cartItems, error: cartError } = await supabase.rpc('get_cart_with_listings', {
-        user_id_param: userId
-      });
+      const { data: cartItems, error: cartError } = await supabase
+        .from('cart_items')
+        .select(`
+          listing_id,
+          quantity,
+          food_listings(id, title, price, image_url)
+        `)
+        .eq('user_id', userId);
       
       if (cartError) throw cartError;
       
       if (cartItems && cartItems.length > 0) {
         const formattedItems: CartItem[] = cartItems.map((item: any) => ({
-          id: item.id,
+          id: crypto.randomUUID(),
           listing_id: item.listing_id,
-          title: item.title,
-          price: item.price,
+          title: item.food_listings.title,
+          price: item.food_listings.price,
           quantity: item.quantity,
-          image_url: item.image_url
+          image_url: item.food_listings.image_url
         }));
         
         set({ items: formattedItems });
