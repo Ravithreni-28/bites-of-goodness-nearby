@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 
 const Cart = () => {
   const { items, removeItem, updateItemQuantity, clearCart } = useCartStore();
@@ -30,7 +31,7 @@ const Cart = () => {
     try {
       setIsProcessing(true);
 
-      // Process the order directly with database insert since create_order function doesn't exist
+      // First, create the order
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -38,12 +39,19 @@ const Cart = () => {
           total_amount: total,
           status: 'pending'
         })
-        .select('id')
+        .select()
         .single();
       
-      if (orderError) throw orderError;
+      if (orderError) {
+        console.error('Order creation error:', orderError);
+        throw new Error('Failed to create order');
+      }
 
-      // Add order items
+      if (!orderData) {
+        throw new Error('No order data returned');
+      }
+
+      // Then create order items
       const orderItems = items.map(item => ({
         order_id: orderData.id,
         listing_id: item.listing_id,
@@ -55,11 +63,14 @@ const Cart = () => {
         .from('order_items')
         .insert(orderItems);
 
-      if (orderItemsError) throw orderItemsError;
+      if (orderItemsError) {
+        console.error('Order items creation error:', orderItemsError);
+        throw new Error('Failed to create order items');
+      }
 
-      toast.success("Thank you for your purchase.");
-      
+      // If successful, clear the cart and show success message
       clearCart();
+      toast.success("Thank you for your purchase! Your order has been confirmed.");
       navigate('/transactions');
       
     } catch (error: any) {

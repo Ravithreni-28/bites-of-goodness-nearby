@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
@@ -74,21 +73,28 @@ export const useCartStore = create<CartStore>((set, get) => ({
       set({ loading: true });
       
       // First, delete existing cart items for this user
-      await supabase.from('cart_items').delete().eq('user_id', userId);
+      const { error: deleteError } = await supabase
+        .from('cart_items')
+        .delete()
+        .eq('user_id', userId);
+      
+      if (deleteError) throw deleteError;
       
       // Now add the current items
       const { items } = get();
       
       if (items.length > 0) {
-        const cartItems: CartItemDB[] = items.map(item => ({
+        const cartItems = items.map(item => ({
           user_id: userId,
           listing_id: item.listing_id,
           quantity: item.quantity
         }));
         
-        const { error } = await supabase.from('cart_items').insert(cartItems);
+        const { error: insertError } = await supabase
+          .from('cart_items')
+          .insert(cartItems);
         
-        if (error) throw error;
+        if (insertError) throw insertError;
         
         toast.success("Cart saved successfully");
       }
@@ -112,7 +118,12 @@ export const useCartStore = create<CartStore>((set, get) => ({
         .select(`
           listing_id,
           quantity,
-          food_listings(id, title, price, image_url)
+          food_listings (
+            id,
+            title,
+            price,
+            image_url
+          )
         `)
         .eq('user_id', userId);
       
