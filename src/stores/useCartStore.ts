@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
@@ -17,20 +18,28 @@ interface CartItemDB {
   quantity: number;
 }
 
+type CheckoutStatus = 'idle' | 'processing' | 'success' | 'error';
+
 type CartStore = {
   items: CartItem[];
   loading: boolean;
+  checkoutStatus: CheckoutStatus;
+  checkoutError: string | null;
   addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
   updateItemQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   saveCartToDatabase: (userId: string) => Promise<void>;
   loadCartFromDatabase: (userId: string) => Promise<void>;
+  processCheckout: (userId: string) => Promise<{ success: boolean; orderId?: string; error?: string }>;
+  resetCheckoutStatus: () => void;
 };
 
 export const useCartStore = create<CartStore>((set, get) => ({
   items: [],
   loading: false,
+  checkoutStatus: 'idle',
+  checkoutError: null,
   
   addItem: (item) => {
     set((state) => {
@@ -147,5 +156,105 @@ export const useCartStore = create<CartStore>((set, get) => ({
     } finally {
       set({ loading: false });
     }
+  },
+
+  processCheckout: async (userId) => {
+    try {
+      set({ 
+        checkoutStatus: 'processing',
+        checkoutError: null
+      });
+
+      const { items } = get();
+      const total = items.reduce(
+        (sum, item) => sum + item.price * item.quantity, 
+        0
+      );
+
+      if (items.length === 0) {
+        throw new Error('Your cart is empty');
+      }
+
+      // Create order
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: userId,
+          total_amount: total,
+          status: 'pending'
+        })
+        .select('id')
+        .single();
+      
+      if (orderError) {
+        throw new Error(`Failed to create order: ${orderError.message}`);
+      }
+
+      if (!orderData?.id) {
+        throw new Error('Failed to create order: No order ID returned');
+      }
+
+      // Create order items
+      const orderItems = items.map(item => ({
+        order_id: orderData.id,
+        listing_id: item.listing_id,
+        quantity: item.quantity,
+        price_per_unit: item.price
+      }));
+
+      const { error: orderItemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (orderItemsError) {
+        throw new Error(`Failed to create order items: ${orderItemsError.message}`);
+      }
+
+      // Update food listings status to 'sold'
+      for (const item of items) {
+        const { error: updateError } = await supabase
+          .from('food_listings')
+          .update({ status: 'sold' })
+          .eq('id', item.listing_id);
+        
+        if (updateError) {
+          console.error(`Failed to update listing status: ${updateError.message}`);
+          // Continue with checkout even if status update fails
+        }
+      }
+
+      // Clear the cart after successful checkout
+      get().clearCart();
+
+      // Also remove cart items from database
+      await supabase
+        .from('cart_items')
+        .delete()
+        .eq('user_id', userId);
+
+      set({ checkoutStatus: 'success' });
+      
+      return {
+        success: true,
+        orderId: orderData.id
+      };
+    } catch (error: any) {
+      console.error('Checkout error:', error);
+      set({ 
+        checkoutStatus: 'error',
+        checkoutError: error.message 
+      });
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  },
+
+  resetCheckoutStatus: () => {
+    set({ 
+      checkoutStatus: 'idle',
+      checkoutError: null
+    });
   }
 }));
