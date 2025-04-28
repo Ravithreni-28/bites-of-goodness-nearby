@@ -48,7 +48,25 @@ export const FoodListings = ({ userLocation, searchQuery }: { userLocation: stri
         throw error;
       }
       
-      setListings(data || []);
+      // Transform data to match expected format, with proper date handling
+      const transformedData = (data || []).map(item => ({
+        ...item,
+        postedAt: item.created_at, // Make sure created_at exists and is a valid date
+        seller: {
+          name: item.profiles?.full_name || 'Anonymous',
+          rating: 5.0, // Default rating if not available
+          avatar: item.profiles?.avatar_url || '',
+          phone: '', // Add default values for required fields
+        },
+        dietary: item.dietary_info ? JSON.parse(item.dietary_info) : [],
+        location: {
+          display: item.location || 'Unknown location',
+          distance: item.distance || 0,
+        },
+        imageUrl: item.image_url || '/placeholder.svg',
+      }));
+      
+      setListings(transformedData);
     } catch (error: any) {
       console.error('Error fetching listings:', error.message);
       toast.error('Failed to load food listings. Please try again later.');

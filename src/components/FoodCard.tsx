@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { MapPin, Clock, Star, IndianRupee, MoreHorizontal, Phone, Info } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { format, formatDistance } from 'date-fns';
+import { format } from 'date-fns';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import type { FoodListing } from '@/utils/mockData';
 import { AddToCartButton } from './AddToCartButton';
+import { formatRelativeTime } from '@/utils/format';
 
 interface FoodCardProps {
   listing: FoodListing;
@@ -49,7 +51,9 @@ const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
   } = listing;
 
   const [showDetails, setShowDetails] = useState(false);
-  const formattedTime = formatDistance(postedAt, new Date(), { addSuffix: true });
+  
+  // Use our custom formatRelativeTime utility instead of directly using formatDistance
+  const formattedTime = postedAt ? formatRelativeTime(postedAt) : 'Unknown time';
 
   return (
     <Card className={`overflow-hidden transition-shadow hover:shadow-lg ${featured ? 'col-span-2' : ''}`}>
