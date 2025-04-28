@@ -1,8 +1,10 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { 
   Dialog, 
@@ -14,15 +16,19 @@ import {
   DialogTrigger,
   DialogClose 
 } from "@/components/ui/dialog";
-import { Plus } from 'lucide-react';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Camera, Plus, X, IndianRupee } from 'lucide-react';
 import { dietaryTags, foodTags } from '@/utils/mockData';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from "sonner";
-import { ImageUpload } from './food-listing/ImageUpload';
-import { TagSelector } from './food-listing/TagSelector';
-import { PriceField } from './food-listing/PriceField';
-import { QuantityUnitFields } from './food-listing/QuantityUnitFields';
 
 interface FoodListingFormProps {
   onSubmit?: (data: any) => void;
@@ -44,26 +50,33 @@ export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) =>
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [location, setLocation] = useState(profile?.address || '');
   const [open, setOpen] = useState(false);
-
+  
   const handleDietaryTagToggle = (tag: string) => {
-    setSelectedDietary(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
+    if (selectedDietary.includes(tag)) {
+      setSelectedDietary(selectedDietary.filter(t => t !== tag));
+    } else {
+      setSelectedDietary([...selectedDietary, tag]);
+    }
   };
 
   const handleFoodTagToggle = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter(t => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
   };
 
-  const handleImageChange = (file: File | null) => {
-    setSelectedImage(file);
-    if (file) {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image is too large. Maximum size is 5MB.');
+        return;
+      }
+      
+      setSelectedImage(file);
       setImagePreview(URL.createObjectURL(file));
     }
   };
@@ -106,17 +119,29 @@ export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) =>
       return;
     }
     
-    if (!title || !description || !location) {
-      toast.error('Please fill in all required fields');
+    if (!title) {
+      toast.error('Please enter a food title');
+      return;
+    }
+
+    if (!description) {
+      toast.error('Please enter a description');
+      return;
+    }
+
+    if (!location) {
+      toast.error('Please enter a pickup location');
       return;
     }
 
     try {
       setIsSubmitting(true);
       
+      // Combine dietary and food tags for category
       const category = selectedDietary.length > 0 ? selectedDietary[0] : 
                      (selectedTags.length > 0 ? selectedTags[0] : 'Other');
 
+      // Insert listing data
       const { data: listing, error: listingError } = await supabase
         .from('food_listings')
         .insert({
@@ -134,6 +159,7 @@ export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) =>
 
       if (listingError) throw listingError;
 
+      // Upload image if selected
       if (selectedImage && listing) {
         const imageUrl = await uploadImage(selectedImage, listing.id);
         
@@ -151,6 +177,7 @@ export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) =>
 
       toast.success('Food listing created successfully!');
       
+      // Reset form
       setTitle('');
       setDescription('');
       setPrice(100);
@@ -159,8 +186,11 @@ export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) =>
       setSelectedDietary([]);
       setSelectedTags([]);
       clearSelectedImage();
+      
+      // Close dialog
       setOpen(false);
       
+      // Call onSubmit callback if provided
       if (onSubmit) {
         onSubmit(listing);
       }
@@ -191,12 +221,45 @@ export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) =>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
-          <ImageUpload
-            selectedImage={selectedImage}
-            imagePreview={imagePreview}
-            onImageChange={handleImageChange}
-            onClearImage={clearSelectedImage}
-          />
+          <div className="space-y-2">
+            <Label htmlFor="food-photo">Food Photo</Label>
+            <div className="relative">
+              {imagePreview ? (
+                <div className="relative">
+                  <img 
+                    src={imagePreview} 
+                    alt="Food preview" 
+                    className="w-full h-48 object-cover rounded-md"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 h-6 w-6 rounded-full bg-white/80 shadow-sm hover:bg-white"
+                    onClick={clearSelectedImage}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div 
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
+                  onClick={() => document.getElementById('food-photo')?.click()}
+                >
+                  <Camera className="h-10 w-10 text-gray-400 mb-2" />
+                  <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
+                  <p className="text-xs text-gray-400">JPG, PNG or JPEG (max. 5MB)</p>
+                </div>
+              )}
+              <input 
+                id="food-photo" 
+                type="file" 
+                className="hidden" 
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </div>
+          </div>
           
           <div className="space-y-2">
             <Label htmlFor="title">Food Title</Label>
@@ -219,32 +282,93 @@ export const FoodListingForm = ({ onSubmit, children }: FoodListingFormProps) =>
             />
           </div>
           
-          <QuantityUnitFields
-            quantity={quantity}
-            unit={unit}
-            onQuantityChange={setQuantity}
-            onUnitChange={setUnit}
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="quantity">Quantity</Label>
+              <Input 
+                id="quantity" 
+                type="number" 
+                placeholder="e.g., 2" 
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="unit">Unit</Label>
+              <Select value={unit} onValueChange={setUnit}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="servings">Servings</SelectItem>
+                  <SelectItem value="pieces">Pieces</SelectItem>
+                  <SelectItem value="grams">Grams</SelectItem>
+                  <SelectItem value="kg">Kilograms</SelectItem>
+                  <SelectItem value="container">Container</SelectItem>
+                  <SelectItem value="handi">Handi</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           
-          <PriceField
-            price={price}
-            onPriceChange={(value) => setPrice(value[0])}
-          />
+          <div className="space-y-3">
+            <div className="flex justify-between">
+              <Label htmlFor="price" className="flex items-center">
+                <span>Price: </span>
+                <IndianRupee className="h-3.5 w-3.5 mx-1" />
+                <span>{price.toFixed(0)}</span>
+              </Label>
+            </div>
+            <Slider
+              id="price"
+              min={0}
+              max={1000}
+              step={10}
+              value={[price]}
+              onValueChange={(value) => setPrice(value[0])}
+            />
+          </div>
           
-          <TagSelector
-            label="Dietary Information"
-            tags={dietaryTags}
-            selectedTags={selectedDietary}
-            onTagToggle={handleDietaryTagToggle}
-          />
+          <div className="space-y-2">
+            <Label>Dietary Information</Label>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {dietaryTags.map((tag) => (
+                <Badge 
+                  key={tag}
+                  variant={selectedDietary.includes(tag) ? "default" : "outline"}
+                  className={`cursor-pointer capitalize ${
+                    selectedDietary.includes(tag) 
+                      ? "bg-green-600 hover:bg-green-700" 
+                      : "hover:bg-green-100"
+                  }`}
+                  onClick={() => handleDietaryTagToggle(tag)}
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          </div>
           
-          <TagSelector
-            label="Food Tags"
-            tags={foodTags}
-            selectedTags={selectedTags}
-            onTagToggle={handleFoodTagToggle}
-            badgeClassName="bg-indigo-600 hover:bg-indigo-700"
-          />
+          <div className="space-y-2">
+            <Label>Food Tags</Label>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {foodTags.map((tag) => (
+                <Badge 
+                  key={tag}
+                  variant={selectedTags.includes(tag) ? "default" : "outline"}
+                  className={`cursor-pointer capitalize ${
+                    selectedTags.includes(tag) 
+                      ? "bg-indigo-600 hover:bg-indigo-700" 
+                      : "hover:bg-indigo-100"
+                  }`}
+                  onClick={() => handleFoodTagToggle(tag)}
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          </div>
           
           <div className="space-y-2">
             <Label>Pickup Address</Label>

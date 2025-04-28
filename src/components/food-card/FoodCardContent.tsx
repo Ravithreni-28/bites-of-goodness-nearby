@@ -11,14 +11,6 @@ interface FoodCardContentProps {
 export const FoodCardContent = ({ listing }: FoodCardContentProps) => {
   const { title, description, location, dietary } = listing;
   
-  const displayLocation = typeof location === 'object' 
-    ? location.display 
-    : location;
-
-  const distance = typeof location === 'object' && location.distance
-    ? `• ${location.distance} km`
-    : '';
-  
   return (
     <>
       <CardHeader className="pt-4 pb-2">
@@ -27,7 +19,14 @@ export const FoodCardContent = ({ listing }: FoodCardContentProps) => {
         </div>
         <div className="flex items-center text-sm text-muted-foreground mt-1">
           <MapPin className="h-3.5 w-3.5 mr-1" />
-          <span>{displayLocation} {distance}</span>
+          <span>
+            {typeof location === 'object' && location?.display 
+              ? location.display 
+              : location}
+            {typeof location === 'object' && location?.distance && (
+              <> • {location.distance} km</>
+            )}
+          </span>
         </div>
       </CardHeader>
 
