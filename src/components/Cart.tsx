@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/useCartStore";
-import { formatCurrency } from "@/utils/format";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { CheckoutSteps } from "./cart/CheckoutSteps";
 import { OrderSummary } from "./cart/OrderSummary";
 import { EmptyCart } from "./cart/EmptyCart";
@@ -21,7 +21,8 @@ const Cart = () => {
     processCheckout,
     checkoutStatus,
     checkoutError,
-    resetCheckoutStatus
+    resetCheckoutStatus,
+    loading
   } = useCartStore();
   const [orderStep, setOrderStep] = useState(0);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -41,21 +42,26 @@ const Cart = () => {
 
   const handleCheckout = async () => {
     if (!user) {
+      toast.error("You must be logged in to checkout");
       navigate('/login');
       return;
     }
 
-    setOrderStep(1);
-
     try {
+      setOrderStep(1);
       const result = await processCheckout(user.id);
       
       if (result.success && result.orderId) {
         setOrderId(result.orderId);
         setOrderStep(2);
+        toast.success("Order placed successfully!");
+      } else {
+        toast.error(result.error || "Failed to process your order");
+        setOrderStep(0);
       }
     } catch (error: any) {
       console.error("Checkout error:", error);
+      toast.error(error.message || "An error occurred during checkout");
       setOrderStep(0);
     }
   };
@@ -102,7 +108,13 @@ const Cart = () => {
         )}
         
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          {orderStep === 0 && (
+          {loading && (
+            <div className="flex justify-center my-8">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600"></div>
+            </div>
+          )}
+          
+          {!loading && orderStep === 0 && (
             <>
               {items.map((item) => (
                 <CartItem
@@ -116,7 +128,7 @@ const Cart = () => {
               <div className="mt-6 border-t pt-4">
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span>{formatCurrency(total)}</span>
+                  <span>₹{total.toFixed(2)}</span>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
                   Taxes and delivery fees calculated at checkout
@@ -125,7 +137,7 @@ const Cart = () => {
             </>
           )}
 
-          {orderStep === 1 && (
+          {!loading && orderStep === 1 && (
             <CartSummary items={items} />
           )}
         </div>
@@ -136,6 +148,7 @@ const Cart = () => {
               <Button 
                 variant="outline"
                 onClick={() => navigate('/')}
+                disabled={loading}
               >
                 Continue Shopping
               </Button>
@@ -145,6 +158,7 @@ const Cart = () => {
                   variant="outline"
                   onClick={() => clearCart()}
                   className="border-red-200 text-red-500 hover:bg-red-50"
+                  disabled={loading}
                 >
                   Clear Cart
                 </Button>
@@ -152,6 +166,7 @@ const Cart = () => {
                 <Button 
                   onClick={() => setOrderStep(1)}
                   className="bg-green-600 hover:bg-green-700"
+                  disabled={loading}
                 >
                   Proceed to Checkout
                 </Button>
@@ -162,13 +177,14 @@ const Cart = () => {
               <Button 
                 variant="outline"
                 onClick={() => setOrderStep(0)}
+                disabled={checkoutStatus === 'processing' || loading}
               >
                 Back to Cart
               </Button>
               
               <Button 
                 onClick={handleCheckout}
-                disabled={checkoutStatus === 'processing'}
+                disabled={checkoutStatus === 'processing' || loading}
                 className="bg-green-600 hover:bg-green-700"
               >
                 {checkoutStatus === 'processing' ? (

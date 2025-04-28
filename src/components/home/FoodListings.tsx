@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
@@ -8,55 +8,102 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FoodCard from '@/components/FoodCard';
 import { useAuth } from '@/contexts/AuthContext';
 import FoodListingForm from '@/components/FoodListingForm';
-import { mockFoodListings } from '@/utils/mockData';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export const FoodListings = ({ userLocation, searchQuery }: { userLocation: string, searchQuery: string }) => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [listings, setListings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const foodCategories = [
     "All", "Breakfast", "Lunch", "Dinner", "Snacks", "Desserts", 
     "Vegetarian", "Non-vegetarian", "Spicy"
   ];
 
-  const filteredListings = mockFoodListings
+  useEffect(() => {
+    fetchListings();
+  }, []);
+
+  const fetchListings = async () => {
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase
+        .from('food_listings')
+        .select(`
+          *,
+          profiles:user_id (
+            full_name,
+            username,
+            avatar_url
+          )
+        `)
+        .eq('status', 'available')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        throw error;
+      }
+      
+      setListings(data || []);
+    } catch (error: any) {
+      console.error('Error fetching listings:', error.message);
+      toast.error('Failed to load food listings. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredListings = listings
     .filter(listing => {
       if (searchQuery) {
         const searchLower = searchQuery.toLowerCase();
         return (
           listing.title.toLowerCase().includes(searchLower) ||
           listing.description.toLowerCase().includes(searchLower) ||
-          listing.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
-          listing.dietary.some(item => item.toLowerCase().includes(searchLower)) ||
-          listing.location.display.toLowerCase().includes(searchLower)
+          listing.category.toLowerCase().includes(searchLower) ||
+          listing.location.toLowerCase().includes(searchLower)
         );
       }
       return true;
     })
     .filter(listing => {
       if (!selectedCategory || selectedCategory === "All") return true;
-      if (selectedCategory === "Vegetarian") return listing.dietary.includes("Vegetarian");
-      if (selectedCategory === "Non-vegetarian") return listing.dietary.includes("Non-vegetarian");
-      if (selectedCategory === "Spicy") return listing.dietary.includes("Spicy");
-      return listing.tags.some(tag => 
-        tag.toLowerCase() === selectedCategory.toLowerCase() || 
-        tag.toLowerCase().includes(selectedCategory.toLowerCase())
-      );
+      
+      if (selectedCategory === "Vegetarian" || 
+          selectedCategory === "Non-vegetarian" || 
+          selectedCategory === "Spicy") {
+        // For these special cases, check if the category matches directly
+        return listing.category.toLowerCase() === selectedCategory.toLowerCase();
+      }
+      
+      // For other categories, check if listing.category includes it
+      return listing.category.toLowerCase() === selectedCategory.toLowerCase();
     });
 
   const getSortedListings = () => {
     switch (activeTab) {
       case "nearby":
-        return [...filteredListings].sort((a, b) => a.location.distance - b.location.distance);
+        // Since we don't have actual distance data yet, just return the filtered listings
+        // In a real app, we would sort by distance from user location
+        return filteredListings;
       case "recent":
-        return [...filteredListings].sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());
+        return [...filteredListings].sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
       default:
         return filteredListings;
     }
   };
 
   const sortedListings = getSortedListings();
+
+  const handleListingSubmit = async (formData: any) => {
+    await fetchListings(); // Refresh listings after submission
+  };
 
   return (
     <section className="container mx-auto py-12 px-4">
@@ -93,12 +140,23 @@ export const FoodListings = ({ userLocation, searchQuery }: { userLocation: stri
               <TabsTrigger value="nearby">Nearby</TabsTrigger>
               <TabsTrigger value="recent">Recent</TabsTrigger>
             </TabsList>
-            {user && <FoodListingForm onSubmit={() => {}} />}
+            {user && <FoodListingForm onSubmit={handleListingSubmit} />}
           </div>
           
           {["all", "nearby", "recent"].map((tab) => (
             <TabsContent key={tab} value={tab} className="pt-6">
-              {sortedListings.length > 0 ? (
+              {loading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[1, 2, 3].map(index => (
+                    <div key={index} className="animate-pulse">
+                      <div className="bg-gray-200 h-52 mb-3 rounded-lg"></div>
+                      <div className="h-5 bg-gray-200 rounded w-2/3 mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/4 mb-1"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : sortedListings.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {sortedListings.map((listing, index) => (
                     <FoodCard 

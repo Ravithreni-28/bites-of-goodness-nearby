@@ -21,6 +21,11 @@ export const CartItem = ({ item, onUpdateQuantity, onRemove }: CartItemProps) =>
           className="w-16 h-16 object-cover rounded-md"
         />
       )}
+      {!item.image_url && (
+        <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center text-gray-400">
+          No image
+        </div>
+      )}
       <div>
         <h3 className="font-medium">{item.title}</h3>
         <p className="text-gray-600">{formatCurrency(item.price)} per item</p>

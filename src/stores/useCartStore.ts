@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
@@ -47,6 +48,21 @@ export const useCartStore = create<CartStore>((set, get) => ({
       const { items } = get();
       const existingItem = items.find((i) => i.listing_id === item.listing_id);
       
+      // Check if the item is still available
+      const { data: listing, error: listingError } = await supabase
+        .from('food_listings')
+        .select('status')
+        .eq('id', item.listing_id)
+        .single();
+        
+      if (listingError) {
+        throw new Error('Failed to check item availability');
+      }
+        
+      if (listing.status !== 'available') {
+        throw new Error('This item is no longer available');
+      }
+      
       if (existingItem) {
         const updatedItems = items.map((i) =>
           i.listing_id === item.listing_id
@@ -58,10 +74,14 @@ export const useCartStore = create<CartStore>((set, get) => ({
         set({ items: [...items, item] });
       }
       
-      await get().saveCartToDatabase(item.user_id);
+      if (item.user_id) {
+        await get().saveCartToDatabase(item.user_id);
+      }
+      
+      toast.success('Item added to cart');
     } catch (error: any) {
       console.error('Error adding item to cart:', error);
-      toast.error('Failed to add item to cart. Please try again.');
+      toast.error(error.message || 'Failed to add item to cart');
     } finally {
       set({ loading: false });
     }
@@ -75,18 +95,22 @@ export const useCartStore = create<CartStore>((set, get) => ({
       set({ items: updatedItems });
       
       const firstItem = items[0];
-      if (firstItem) {
+      if (firstItem?.user_id) {
         await get().saveCartToDatabase(firstItem.user_id);
       }
+      
+      toast.success('Item removed from cart');
     } catch (error: any) {
       console.error('Error removing item from cart:', error);
-      toast.error('Failed to remove item from cart. Please try again.');
+      toast.error('Failed to remove item from cart');
     } finally {
       set({ loading: false });
     }
   },
   
   updateItemQuantity: async (id, quantity) => {
+    if (quantity < 1) return;
+    
     try {
       set({ loading: true });
       const { items } = get();
@@ -96,12 +120,12 @@ export const useCartStore = create<CartStore>((set, get) => ({
       set({ items: updatedItems });
       
       const firstItem = items[0];
-      if (firstItem) {
+      if (firstItem?.user_id) {
         await get().saveCartToDatabase(firstItem.user_id);
       }
     } catch (error: any) {
       console.error('Error updating item quantity:', error);
-      toast.error('Failed to update item quantity. Please try again.');
+      toast.error('Failed to update item quantity');
     } finally {
       set({ loading: false });
     }
@@ -139,8 +163,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
       }
     } catch (error: any) {
       console.error('Error saving cart:', error);
-      toast.error('Failed to save cart changes. Please try again.');
-      throw error;
+      toast.error('Failed to save cart changes');
     } finally {
       set({ loading: false });
     }
@@ -148,9 +171,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
   
   loadCartFromDatabase: async (userId) => {
     try {
-      set({ loading: true });
-      
-      set({ items: [] });
+      set({ loading: true, items: [] });
       
       const { data: cartItems, error: cartError } = await supabase
         .from('cart_items')
@@ -170,8 +191,9 @@ export const useCartStore = create<CartStore>((set, get) => ({
       if (cartError) throw cartError;
       
       if (cartItems && cartItems.length > 0) {
+        // Filter to only include available items
         const availableItems = cartItems.filter(
-          item => item.food_listings.status === 'available'
+          (item: any) => item.food_listings && item.food_listings.status === 'available'
         );
         
         if (availableItems.length < cartItems.length) {
@@ -184,14 +206,15 @@ export const useCartStore = create<CartStore>((set, get) => ({
           title: item.food_listings.title,
           price: item.food_listings.price,
           quantity: item.quantity,
-          image_url: item.food_listings.image_url
+          image_url: item.food_listings.image_url,
+          user_id: userId
         }));
         
         set({ items: formattedItems });
       }
     } catch (error: any) {
       console.error('Error loading cart:', error);
-      toast.error('Failed to load your cart. Please refresh the page.');
+      toast.error('Failed to load your cart');
     } finally {
       set({ loading: false });
     }
@@ -210,6 +233,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
         throw new Error('Your cart is empty');
       }
 
+      // Check if all items are still available
       const listingIds = items.map(item => item.listing_id);
       const { data: listings, error: listingError } = await supabase
         .from('food_listings')
@@ -223,11 +247,13 @@ export const useCartStore = create<CartStore>((set, get) => ({
         throw new Error('Some items in your cart are no longer available');
       }
 
+      // Calculate total
       const total = items.reduce(
         (sum, item) => sum + item.price * item.quantity, 
         0
       );
 
+      // Create order
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -246,6 +272,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
         throw new Error('Failed to create order: No order ID returned');
       }
 
+      // Add order items
       const orderItems = items.map(item => ({
         order_id: orderData.id,
         listing_id: item.listing_id,
@@ -261,19 +288,20 @@ export const useCartStore = create<CartStore>((set, get) => ({
         throw new Error(`Failed to create order items: ${orderItemsError.message}`);
       }
 
-      for (const item of items) {
-        const { error: updateError } = await supabase
+      // Mark listings as sold
+      const updatePromises = items.map(item => 
+        supabase
           .from('food_listings')
           .update({ status: 'sold' })
-          .eq('id', item.listing_id);
-        
-        if (updateError) {
-          console.error(`Failed to update listing status: ${updateError.message}`);
-        }
-      }
+          .eq('id', item.listing_id)
+      );
+      
+      await Promise.all(updatePromises);
 
+      // Clear the cart
       get().clearCart();
 
+      // Delete cart items from database
       await supabase
         .from('cart_items')
         .delete()
