@@ -9,6 +9,7 @@ export type CartItem = {
   quantity: number;
   image_url?: string | null;
   listing_id: string;
+  user_id?: string;
 };
 
 interface CartItemDB {
