@@ -48,7 +48,32 @@ export const FoodListings = ({ userLocation, searchQuery }: { userLocation: stri
         throw error;
       }
       
-      setListings(data || []);
+      // Process listings to match the expected format
+      const processedListings = data?.map(item => {
+        return {
+          ...item,
+          imageUrl: item.image_url || '/placeholder.svg',
+          // Format location as expected by FoodCard
+          location: {
+            display: item.location || 'Unknown location',
+            distance: '1.2' // Default distance since we don't have actual location data
+          },
+          // Set postedAt to the created_at date
+          postedAt: new Date(item.created_at),
+          // Create seller object from profiles
+          seller: {
+            name: item.profiles?.full_name || 'Unknown',
+            avatar: item.profiles?.avatar_url || '/placeholder.svg',
+            rating: '4.5', // Default rating
+            phone: ''
+          },
+          // Default empty arrays for dietary and tags if they don't exist
+          dietary: [],
+          tags: []
+        };
+      }) || [];
+      
+      setListings(processedListings);
     } catch (error: any) {
       console.error('Error fetching listings:', error.message);
       toast.error('Failed to load food listings. Please try again later.');
@@ -65,7 +90,9 @@ export const FoodListings = ({ userLocation, searchQuery }: { userLocation: stri
           listing.title.toLowerCase().includes(searchLower) ||
           listing.description.toLowerCase().includes(searchLower) ||
           listing.category.toLowerCase().includes(searchLower) ||
-          listing.location.toLowerCase().includes(searchLower)
+          (typeof listing.location === 'string' 
+            ? listing.location.toLowerCase().includes(searchLower)
+            : listing.location.display.toLowerCase().includes(searchLower))
         );
       }
       return true;

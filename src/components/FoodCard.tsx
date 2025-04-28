@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { MapPin, Clock, Star, IndianRupee, MoreHorizontal, Phone, Info } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { format, formatDistance } from 'date-fns';
+import { formatRelativeTime, isValidDate } from '@/utils/format';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -49,7 +50,11 @@ const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
   } = listing;
 
   const [showDetails, setShowDetails] = useState(false);
-  const formattedTime = formatDistance(postedAt, new Date(), { addSuffix: true });
+  
+  // Add safety check for date formatting
+  const formattedTime = isValidDate(postedAt) 
+    ? formatRelativeTime(postedAt) 
+    : 'Recently';
 
   return (
     <Card className={`overflow-hidden transition-shadow hover:shadow-lg ${featured ? 'col-span-2' : ''}`}>
@@ -95,7 +100,7 @@ const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
                   <p className="text-sm text-gray-700">{description}</p>
                 </div>
                 <div className="flex flex-wrap gap-1">
-                  {dietary.map(item => (
+                  {dietary && dietary.map(item => (
                     <Badge key={item} variant="outline" className="text-xs bg-green-50">
                       {item}
                     </Badge>
@@ -126,8 +131,8 @@ const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
                 <div className="border-t pt-4">
                   <h4 className="font-medium mb-2 flex items-center">
                     <Avatar className="h-4 w-4 mr-2">
-                      <AvatarImage src={seller.avatar} alt={seller.name} />
-                      <AvatarFallback>{seller.name.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={seller?.avatar} alt={seller?.name} />
+                      <AvatarFallback>{seller?.name?.charAt(0) || '?'}</AvatarFallback>
                     </Avatar>
                     Owner Details
                   </h4>
@@ -135,25 +140,27 @@ const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
                     <div className="flex items-center">
                       <span className="text-sm text-muted-foreground min-w-24">Name:</span>
                       <span className="text-sm font-medium flex items-center">
-                        {seller.name}
-                        <span className="flex items-center text-amber-500 ml-2">
-                          <Star className="h-3 w-3 fill-current text-amber-500" />
-                          <span className="ml-0.5">{seller.rating}</span>
-                        </span>
+                        {seller?.name || 'Unknown'}
+                        {seller?.rating && (
+                          <span className="flex items-center text-amber-500 ml-2">
+                            <Star className="h-3 w-3 fill-current text-amber-500" />
+                            <span className="ml-0.5">{seller.rating}</span>
+                          </span>
+                        )}
                       </span>
                     </div>
                     <div className="flex items-center">
                       <span className="text-sm text-muted-foreground min-w-24">Phone:</span>
                       <span className="text-sm font-medium flex items-center">
                         <Phone className="h-3.5 w-3.5 mr-1" />
-                        {seller.phone || "+91 9876XXXXXX"}
+                        {seller?.phone || "+91 9876XXXXXX"}
                       </span>
                     </div>
                     <div className="flex items-center">
                       <span className="text-sm text-muted-foreground min-w-24">Location:</span>
                       <span className="text-sm font-medium flex items-center">
                         <MapPin className="h-3.5 w-3.5 mr-1" />
-                        {location.display}
+                        {location?.display || location || 'Unknown location'}
                       </span>
                     </div>
                   </div>
@@ -173,14 +180,19 @@ const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
         </div>
         <div className="flex items-center text-sm text-muted-foreground mt-1">
           <MapPin className="h-3.5 w-3.5 mr-1" />
-          <span>{location.display} • {location.distance} km</span>
+          <span>
+            {typeof location === 'object' && location?.display ? location.display : location}
+            {typeof location === 'object' && location?.distance && (
+              <> • {location.distance} km</>
+            )}
+          </span>
         </div>
       </CardHeader>
 
       <CardContent className="pb-3">
         <p className="text-sm text-gray-600 line-clamp-2">{description}</p>
         <div className="flex flex-wrap gap-1 mt-3">
-          {dietary.length > 0 && dietary.map(item => (
+          {dietary && dietary.length > 0 && dietary.map(item => (
             <Badge key={item} variant="outline" className="text-xs bg-green-50">
               {item}
             </Badge>
@@ -190,7 +202,7 @@ const FoodCard = ({ listing, featured = false }: FoodCardProps) => {
 
       <CardFooter className="flex justify-between items-center">
         <div className="text-2xl font-bold text-gray-900">
-          ₹{listing.price}
+          ₹{price}
         </div>
         <AddToCartButton 
           listingId={listing.id} 

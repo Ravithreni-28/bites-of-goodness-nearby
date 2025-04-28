@@ -12,9 +12,21 @@ export const formatCurrency = (amount: number): string => {
 };
 
 /**
+ * Check if a value is a valid date
+ */
+export const isValidDate = (date: any): boolean => {
+  if (!date) return false;
+  const d = new Date(date);
+  // Check if the date is valid and not NaN
+  return !isNaN(d.getTime());
+};
+
+/**
  * Format a date as a readable string
  */
 export const formatDate = (date: string | Date): string => {
+  if (!isValidDate(date)) return 'Invalid date';
+  
   return new Date(date).toLocaleDateString('en-IN', {
     year: 'numeric',
     month: 'long',
@@ -26,6 +38,8 @@ export const formatDate = (date: string | Date): string => {
  * Format a timestamp in relative time (e.g., "2 hours ago")
  */
 export const formatRelativeTime = (timestamp: string | Date): string => {
+  if (!isValidDate(timestamp)) return 'Unknown time';
+  
   const now = new Date();
   const date = new Date(timestamp);
   const diffInMilliseconds = now.getTime() - date.getTime();
